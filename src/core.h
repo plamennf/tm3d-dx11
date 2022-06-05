@@ -368,10 +368,15 @@ struct Time_Info {
     f64 current_dt;
 };
 
+enum Program_Mode {
+    PROGRAM_MODE_GAME,
+};
+
 struct Core {
     bool should_quit;
     char *operating_folder;
     Time_Info time_info;
+    Program_Mode program_mode = PROGRAM_MODE_GAME;
 };
 
 extern Core core;

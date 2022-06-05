@@ -76,13 +76,18 @@ static void main_loop() {
         if (is_key_pressed(KEY_F11)) {
             display_toggle_fullscreen();
         }
-        
-        os_hide_cursor();
-        
-        simulate_game();
-        
+
         if (core.time_info.current_dt) {
-            draw_game_view();
+            if (core.program_mode == PROGRAM_MODE_GAME) {
+                os_hide_cursor();
+                simulate_game();
+            }
+        }
+
+        if (core.time_info.current_dt) {
+            if (core.program_mode == PROGRAM_MODE_GAME) {
+                draw_game_view();
+            }
         }
         
         swap_buffers();
