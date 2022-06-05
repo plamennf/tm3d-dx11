@@ -654,17 +654,23 @@ void clear_render_target(f32 r, f32 g, f32 b, f32 a) {
     }
 }
 
-void draw_mesh(Mesh *mesh, Vector3 position, f32 scale) {
-    object_to_world_matrix = matrix4_identity();
+void draw_mesh(Mesh *mesh, Vector3 position, Vector3 rotation, f32 scale) {
+    Matrix4 m = matrix4_identity();
 
-    object_to_world_matrix._11 = scale;
-    object_to_world_matrix._22 = scale;
-    object_to_world_matrix._33 = scale;
+    m._11 = scale;
+    m._22 = scale;
+    m._33 = scale;
 
-    object_to_world_matrix._14 = position.x;
-    object_to_world_matrix._24 = position.y;
-    object_to_world_matrix._34 = position.z;
+    m._14 = position.x;
+    m._24 = position.y;
+    m._34 = position.z;
     
+    Matrix4 rot_x = make_x_rotation(rotation.x * (PI / 180.0f));
+    Matrix4 rot_y = make_y_rotation(rotation.y * (PI / 180.0f));
+    Matrix4 rot_z = make_z_rotation(rotation.z * (PI / 180.0f));
+    Matrix4 r = rot_x * rot_y * rot_z;
+    
+    object_to_world_matrix = m * r;
     refresh_transform();
     
     UINT stride = sizeof(Mesh_Vertex);

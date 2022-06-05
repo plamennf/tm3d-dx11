@@ -4,6 +4,7 @@
 #include "mesh.h"
 #include "os.h"
 #include "catalog.h"
+#include "entities.h"
 
 #ifdef DEBUG
 #include "debug.h"
@@ -85,7 +86,7 @@ void draw_game_view() {
     clear_render_target(0.2f, 0.5f, 0.8f, 1.0f);
 
     draw_game_3d();
-    draw_game_2d();
+    //draw_game_2d();
     
     set_render_target(the_back_buffer);
     set_depth_target(the_back_depth_buffer);
@@ -127,17 +128,20 @@ void draw_game_view() {
 }
 
 static void draw_game_3d() {
-    extern Mesh *mesh;
-    
-    set_shader(shader_basic_3d);
-
-    set_diffuse_texture(mesh->map);
-    
     f32 aspect_ratio = (f32)render_target_width / (f32)render_target_height;
     view_to_proj_matrix = make_perspective_projection(aspect_ratio, 70.0f * (PI / 180.0f), 0.1f, 1000.0f);
     refresh_transform();
     
-    draw_mesh(mesh, make_vector3(0.0f, -0.2f, -5.0f), 0.2f);    
+    set_shader(shader_basic_3d);
+
+    {
+        Entity_Manager *manager = get_entity_manager();
+        
+        Guy *guy = manager->guy;
+        
+        set_diffuse_texture(guy->mesh->map);
+        draw_mesh(guy->mesh, guy->position, guy->rotation, guy->scale);
+    }
 }
 
 static void draw_game_2d() {

@@ -22,6 +22,13 @@ static Key win32_vk_code_to_key(u32 vk_code) {
     switch (vk_code) {
     case VK_F11: return KEY_F11;
     case VK_ESCAPE: return KEY_ESCAPE;
+
+    case VK_SPACE: return KEY_SPACE;
+        
+    case 'A': return KEY_A;
+    case 'D': return KEY_D;
+    case 'W': return KEY_W;
+    case 'S': return KEY_S;
     }
     return KEY_UNKNOWN;
 }

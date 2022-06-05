@@ -10,13 +10,15 @@ cbuffer Transform : register(b0) {
     float4x4 projection;
     float4x4 view;
     float4x4 world;
+    float4x4 transform;
 };
 
 VSOutput vertex_main(float3 position : POSITION, float2 uv : UV, float3 normal : NORMAL) {
     VSOutput output;
 
-    float4x4 wvp = mul(projection, mul(view, world));
-    output.position = mul(wvp, float4(position, 1.0));
+    output.position = mul(world, float4(position, 1.0));
+    output.position = mul(view, output.position);
+    output.position = mul(projection, output.position);
     output.uv = uv;
     output.normal = normal;
     

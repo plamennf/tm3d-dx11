@@ -6,6 +6,7 @@
 #include "catalog.h"
 #include "mesh.h"
 #include "input.h"
+#include "entities.h"
 
 #include <stdio.h>
 
@@ -13,11 +14,21 @@ Core core = {};
 
 Mesh *mesh;
 
+static Entity_Manager *entity_manager = new Entity_Manager();
+
+Entity_Manager *get_entity_manager() {
+    return entity_manager;
+}
+
 static void update_time() {
     f64 now_time = os_get_time();
     core.time_info.current_dt = now_time - core.time_info.last_time;    
     core.time_info.last_time = now_time;
 }
+
+static void game_init();
+static void main_loop();
+static void simulate_game();
 
 int main(int argc, char **argv) {
     {
@@ -41,6 +52,14 @@ int main(int argc, char **argv) {
 
     core.time_info.last_time = os_get_time();
     core.time_info.current_dt = 0.0;
+
+    game_init();
+    main_loop();
+    
+    return 0;
+}
+
+static void main_loop() {
     while (!core.should_quit) {
         if (!display_is_open()) {
             core.should_quit = true;
@@ -52,6 +71,8 @@ int main(int argc, char **argv) {
             core.should_quit = true;
             break;
         }
+
+        simulate_game();
         
         if (core.time_info.current_dt) {
             draw_game_view();
@@ -61,6 +82,17 @@ int main(int argc, char **argv) {
 
         update_time();
     }
-    
-    return 0;
+}
+
+static void game_init() {
+    entity_manager = new Entity_Manager();
+
+    Guy *guy = entity_manager->add_guy();
+    guy->mesh = load_obj("dragon");
+    guy->mesh->map = find_or_create_texture("white");
+    guy->position = make_vector3(0, 0, -50);
+}
+
+static void simulate_game() {
+    simulate_guy(entity_manager->guy);
 }

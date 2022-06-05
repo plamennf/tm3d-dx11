@@ -80,7 +80,7 @@ void rendering_2d_right_handed();
 
 void draw_text(struct Font *font, char *text, int x, int y, Vector4 color);
 
-void draw_mesh(Mesh *mesh, Vector3 position, f32 scale);
+void draw_mesh(Mesh *mesh, Vector3 position, Vector3 rotation, f32 scale);
 
 void draw_game_view();
 

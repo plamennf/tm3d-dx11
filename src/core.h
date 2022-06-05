@@ -376,4 +376,7 @@ struct Core {
 
 extern Core core;
 
+struct Entity_Manager;
+Entity_Manager *get_entity_manager();
+
 #endif

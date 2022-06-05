@@ -44,6 +44,8 @@ headers {
     src\catalog.h
     src\debug.h
     src\input.h
+    src\entities.h
+    src\camera.h
 }
 
 files {
@@ -57,6 +59,8 @@ files {
     src\catalog.cpp
     src\debug.cpp
     src\input.cpp
+    src\entities.cpp
+    src\camera.cpp
 }
 
 prebuildcmd: compile_shaders.bat

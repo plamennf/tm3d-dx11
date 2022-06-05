@@ -8,8 +8,17 @@ struct Key_Info {
 
 enum Key {
     KEY_UNKNOWN,
+
+    KEY_A,
+    KEY_D,
+    KEY_W,
+    KEY_S,
+    
+    KEY_SPACE,
+    
     KEY_F11,
     KEY_ESCAPE,
+    
     NUM_KEYS,
 };
 

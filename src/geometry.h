@@ -3,6 +3,8 @@
 
 #include "core.h"
 
+#include <math.h>
+
 union Vector2 {
     struct { f32 x, y; };
     struct { f32 r, g; };
@@ -134,6 +136,48 @@ inline Matrix4 make_perspective_projection(f32 aspect_ratio, f32 fov, f32 z_near
     result._33 = d;
     result._34 = e;
     result._43 = -1.0f;
+    
+    return result;
+}
+
+inline Matrix4 make_x_rotation(f32 t) {
+    Matrix4 result = matrix4_identity();
+
+    f32 ct = cosf(t);
+    f32 st = sinf(t);
+
+    result._22 = ct;
+    result._23 = -st;
+    result._32 = st;
+    result._33 = ct;
+    
+    return result;
+}
+
+inline Matrix4 make_y_rotation(f32 t) {
+    Matrix4 result = matrix4_identity();
+
+    f32 ct = cosf(t);
+    f32 st = sinf(t);
+
+    result._11 = ct;
+    result._31 = -st;
+    result._13 = st;
+    result._33 = ct;
+    
+    return result;
+}
+
+inline Matrix4 make_z_rotation(f32 t) {
+    Matrix4 result = matrix4_identity();
+
+    f32 ct = cosf(t);
+    f32 st = sinf(t);
+
+    result._11 = ct;
+    result._12 = -st;
+    result._21 = st;
+    result._22 = ct;
     
     return result;
 }
