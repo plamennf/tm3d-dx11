@@ -7,6 +7,7 @@
 #include "mesh.h"
 #include "input.h"
 #include "entities.h"
+#include "hash_table.h"
 
 #include <stdio.h>
 

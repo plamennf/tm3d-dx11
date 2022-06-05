@@ -46,6 +46,7 @@ headers {
     src\input.h
     src\entities.h
     src\camera.h
+    src\hash_table.h
 }
 
 files {

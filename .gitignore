@@ -5,3 +5,4 @@ bin-int/
 obj/
 compiled/
 *.pdb
+*.ilk

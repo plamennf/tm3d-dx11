@@ -56,7 +56,17 @@ Font *get_font_at_size(char *short_name, int size) {
 }
 
 Glyph *get_or_load_glyph(Font *font, int codepoint) {
+#if 0
     Glyph *glyph = &font->glyphs[codepoint];
+#else
+    Glyph *glyph = nullptr;
+    bool glyph_exists = font->glyphs.contains(codepoint);
+    if (!glyph_exists) {
+        Glyph tmp = {};
+        font->glyphs.add(codepoint, tmp);
+    }
+    glyph = &font->glyphs.get(codepoint);
+#endif
 
     if (glyph->height == font->character_height) return glyph;
 
