@@ -7,5 +7,6 @@ int display_get_width();
 int display_get_height();
 bool display_is_open();
 void *display_get_native_window();
+void display_toggle_fullscreen();
 
 #endif

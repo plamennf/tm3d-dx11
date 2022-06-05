@@ -2,7 +2,10 @@
 
 #include "os.h"
 #include "input.h"
+#include "display.h"
 
+#define UNICODE
+#define _UNICODE
 #include <windows.h>
 #include <string.h>
 
@@ -116,20 +119,6 @@ double os_get_time() {
     return (double)perf_count / (double)perf_freq;
 }
 
-char *os_getcwd() {
-    int required_size = GetCurrentDirectory(0, nullptr);
-    if (!required_size) return nullptr;
-
-    char *result = new char[required_size + 1];
-    memset(result, 0, (required_size + 1) * sizeof(char));
-
-    GetCurrentDirectory(required_size + 1, result);
-
-    printf("%s\n", result);
-    
-    return result;
-}
-
 void os_setcwd(char *_dir) {
     char *dir = copy_string(_dir);
     defer { delete [] dir; };
@@ -139,8 +128,11 @@ void os_setcwd(char *_dir) {
             at[0] = '\\';
         }
     }
+
+    wchar_t *wide_dir = win32_utf8_to_utf16(dir);
+    defer { delete [] wide_dir; };
     
-    SetCurrentDirectory(dir);
+    SetCurrentDirectoryW(wide_dir);
 }
 
 char *os_get_path_to_executable() {
@@ -155,6 +147,23 @@ char *os_get_path_to_executable() {
         }
     }
     return result;
+}
+
+void os_hide_cursor() {
+    SetCursor(nullptr);
+
+    HWND hwnd = (HWND) display_get_native_window();
+    
+    RECT clip_rect;
+    GetClientRect(hwnd, &clip_rect);
+    ClientToScreen(hwnd, (POINT *)&clip_rect.left);
+    ClientToScreen(hwnd, (POINT *)&clip_rect.right);
+    ClipCursor(&clip_rect);
+}
+
+void os_show_cursor() {
+    HCURSOR cursor_handle = LoadCursorW(nullptr, IDC_ARROW);
+    SetCursor(cursor_handle);
 }
 
 #endif

@@ -15,6 +15,7 @@ static bool is_open = true;
 static int display_width;
 static int display_height;
 static HWND window_handle;
+static WINDOWPLACEMENT window_placement = { sizeof(window_placement) };
 
 extern Key_Info key_infos[NUM_KEYS];
 
@@ -71,7 +72,7 @@ static LRESULT CALLBACK win32_window_callback(HWND hwnd, UINT msg, WPARAM wparam
         
         break;
     }
-            
+        
     default:
         result = DefWindowProcW(hwnd, msg, wparam, lparam);
         break;
@@ -85,7 +86,7 @@ void display_init(int width, int height, char *title) {
     wnd_class.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
     wnd_class.lpfnWndProc = win32_window_callback;
     wnd_class.hInstance = GetModuleHandleW(nullptr);
-    wnd_class.hCursor = LoadCursorW(nullptr, IDC_ARROW);
+    wnd_class.hCursor = nullptr;
     wnd_class.lpszClassName = L"TM3DWin32WindowClass";
     ATOM result = RegisterClassW(&wnd_class);
     assert(result);
@@ -145,6 +146,26 @@ bool display_is_open() {
 
 void *display_get_native_window() {
     return (void *)window_handle;
+}
+
+void display_toggle_fullscreen() {
+    DWORD style = GetWindowLongW(window_handle, GWL_STYLE);
+    if (style & WS_OVERLAPPEDWINDOW) {
+        MONITORINFO mi = { sizeof(mi) };
+        if (GetWindowPlacement(window_handle, &window_placement) &&
+            GetMonitorInfoW(MonitorFromWindow(window_handle, MONITOR_DEFAULTTOPRIMARY), &mi)) {
+            SetWindowLongW(window_handle, GWL_STYLE, style & ~WS_OVERLAPPEDWINDOW);
+            SetWindowPos(window_handle, HWND_TOP, mi.rcMonitor.left, mi.rcMonitor.top,
+                         mi.rcMonitor.right - mi.rcMonitor.left,
+                         mi.rcMonitor.bottom - mi.rcMonitor.top,
+                         SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+        }
+    } else {
+        SetWindowLongW(window_handle, GWL_STYLE, style | WS_OVERLAPPEDWINDOW);
+        SetWindowPlacement(window_handle, &window_placement);
+        SetWindowPos(window_handle, nullptr, 0, 0, 0, 0,
+                     SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+    }
 }
 
 #endif

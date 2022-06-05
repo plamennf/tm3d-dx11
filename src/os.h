@@ -19,9 +19,10 @@ bool os_file_exists(char *filepath);
 
 void os_poll_events();
 
-char *os_getcwd();
+char *os_get_path_to_executable();
 void os_setcwd(char *dir);
 
-char *os_get_path_to_executable();
+void os_hide_cursor();
+void os_show_cursor();
 
 #endif

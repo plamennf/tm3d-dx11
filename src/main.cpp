@@ -72,6 +72,12 @@ static void main_loop() {
             break;
         }
 
+        if (is_key_pressed(KEY_F11)) {
+            display_toggle_fullscreen();
+        }
+        
+        os_hide_cursor();
+        
         simulate_game();
         
         if (core.time_info.current_dt) {

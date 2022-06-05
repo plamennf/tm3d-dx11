@@ -32,6 +32,7 @@ void draw_debug_info() {
     Font *font = get_font_at_size("OpenSans-SemiBold.ttf", font_size);
 
     int y = render_target_height - font->character_height;
+    int offset = font->character_height / 20;
     
     {
         char *text = mprintf("%.2lf fps", 1.0 / dt_for_draw);
@@ -39,6 +40,7 @@ void draw_debug_info() {
         
         int x = render_target_width - get_string_width_in_pixels(font, text);
         
+        draw_text(font, text, x + offset, y - offset, make_vector4(0, 0, 0, 1));
         draw_text(font, text, x, y, make_vector4(1, 1, 1, 1));
     }
 
@@ -51,7 +53,8 @@ void draw_debug_info() {
         defer { delete [] text; };
         
         int x = render_target_width - get_string_width_in_pixels(font, text);
-        
+
+        draw_text(font, text, x + offset, y - offset, make_vector4(0, 0, 0, 1));
         draw_text(font, text, x, y, make_vector4(1, 1, 1, 1));        
     }
 }

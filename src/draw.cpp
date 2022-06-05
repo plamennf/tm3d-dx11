@@ -86,7 +86,7 @@ void draw_game_view() {
     clear_render_target(0.2f, 0.5f, 0.8f, 1.0f);
 
     draw_game_3d();
-    //draw_game_2d();
+    draw_game_2d();
     
     set_render_target(the_back_buffer);
     set_depth_target(the_back_depth_buffer);
@@ -145,6 +145,7 @@ static void draw_game_3d() {
 }
 
 static void draw_game_2d() {
+#if 0
     //
     // Draw crosshair
     //
@@ -162,6 +163,7 @@ static void draw_game_2d() {
 
         draw_text(big_font, text, x, y, make_vector4(1, 1, 1, 1));
     }
+#endif
     
 #ifdef _DEBUG
     draw_debug_info();
