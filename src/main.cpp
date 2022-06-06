@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
     {
         char *exe = os_get_path_to_executable();
         defer { delete [] exe; };
-
+        
         auto slash = find_character_from_right(exe, '/');
         slash += 1;
 
@@ -67,7 +67,7 @@ static void main_loop() {
             break;
         }
         os_poll_events();
-
+        
         if (is_key_pressed(KEY_ESCAPE)) {
             core.should_quit = true;
             break;
@@ -98,7 +98,7 @@ static void main_loop() {
 
 static void game_init() {
     entity_manager = new Entity_Manager();
-
+    
     Guy *guy = entity_manager->add_guy();
     guy->mesh = load_obj("dragon");
     guy->mesh->map = find_or_create_texture("white");
