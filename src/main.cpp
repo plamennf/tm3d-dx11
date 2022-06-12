@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
     
     display_init(1280, 720, "TM3D-DX11");
     init_draw(true, true, 4);
-
+    
     mesh = load_obj("stall");
     mesh->map = find_or_create_texture("stall");
 
@@ -91,7 +91,7 @@ static void main_loop() {
         }
         
         swap_buffers();
-
+        
         update_time();
     }
 }

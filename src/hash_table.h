@@ -92,6 +92,11 @@ struct Hash_Table {
         count++;
     }
 
+    inline void add(Key key) {
+        Value value = {};
+        add(key, value);
+    }
+
     Value &get(Key key) {
         auto hk = hash(key) & (allocated - 1);
         for (int i = 0; i < allocated && occupancy_mask[hk] && buckets[hk].key != key; i++) {

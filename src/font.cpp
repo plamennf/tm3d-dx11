@@ -56,18 +56,13 @@ Font *get_font_at_size(char *short_name, int size) {
 }
 
 Glyph *get_or_load_glyph(Font *font, int codepoint) {
-#if 0
-    Glyph *glyph = &font->glyphs[codepoint];
-#else
     Glyph *glyph = nullptr;
     bool glyph_exists = font->glyphs.contains(codepoint);
     if (!glyph_exists) {
-        Glyph tmp = {};
-        font->glyphs.add(codepoint, tmp);
+        font->glyphs.add(codepoint);
     }
     glyph = &font->glyphs.get(codepoint);
-#endif
-
+    
     if (glyph->height == font->character_height) return glyph;
 
     unsigned long glyph_index = FT_Get_Char_Index(font->face, codepoint);
@@ -128,7 +123,7 @@ int get_kerning_in_pixels(Font *font, int codepoint, int next_codepoint) {
 
 int get_string_width_in_pixels(Font *font, char *text) {
     if (!text) return 0;
-
+    
     int width = 0;
     for (char *at = text; *at;) {
         int codepoint_byte_count = 0;
