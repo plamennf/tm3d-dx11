@@ -151,15 +151,38 @@ char *os_get_path_to_executable() {
 }
 
 void os_hide_cursor() {
-    SetCursor(nullptr);
-
-    HWND hwnd = (HWND) display_get_native_window();
+    int count = ShowCursor(FALSE);
+    while (count < -1) {
+        ShowCursor(TRUE);
+        count++;
+    }
     
-    RECT clip_rect;
-    GetClientRect(hwnd, &clip_rect);
-    ClientToScreen(hwnd, (POINT *)&clip_rect.left);
-    ClientToScreen(hwnd, (POINT *)&clip_rect.right);
-    ClipCursor(&clip_rect);
+    HWND hwnd = (HWND) display_get_native_window();
+    RECT rect;
+    GetClientRect(hwnd, &rect);
+
+    POINT point;
+    point.x = 0;
+    point.y = 0;
+    ClientToScreen(hwnd, &point);
+
+    rect.left += point.x;
+    rect.right += point.x;
+    rect.top += point.y;
+    rect.bottom += point.y;
+    ClipCursor(&rect);
+
+    int cx = (rect.left + rect.right) / 2;
+    int cy = (rect.bottom + rect.top) / 2;
+
+    POINT old_point;
+    GetCursorPos(&old_point);
+    SetCursorPos(cx, cy);
+
+    extern int mouse_pointer_delta_x;
+    extern int mouse_pointer_delta_y;
+    mouse_pointer_delta_x = old_point.x - cx;
+    mouse_pointer_delta_y = cy - old_point.y;
 }
 
 void os_show_cursor() {

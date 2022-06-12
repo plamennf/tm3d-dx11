@@ -32,5 +32,7 @@ enum Key {
 bool is_key_down(Key key);
 bool is_key_pressed(Key key);
 bool was_key_pressed(Key key);
+int get_mouse_pointer_delta_x();
+int get_mouse_pointer_delta_y();
 
 #endif

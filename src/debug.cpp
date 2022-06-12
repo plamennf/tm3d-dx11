@@ -3,6 +3,7 @@
 #include "draw.h"
 #include "font.h"
 #include "os.h"
+#include "input.h"
 
 const f64 NUM_SECONDS_BETWEEN_UPDATES = 0.05;
 static f64 num_seconds_since_last_update;
@@ -54,6 +55,18 @@ void draw_debug_info() {
         
         int x = render_target_width - get_string_width_in_pixels(font, text);
 
+        draw_text(font, text, x + offset, y - offset, make_vector4(0, 0, 0, 1));
+        draw_text(font, text, x, y, make_vector4(1, 1, 1, 1));        
+    }
+
+    y -= font->character_height;
+    
+    {
+        char *text = mprintf("Mouse pointer delta: (%d, %d)", get_mouse_pointer_delta_x(), get_mouse_pointer_delta_y());
+        defer { delete [] text; };
+
+        int x = render_target_width - get_string_width_in_pixels(font, text);
+        
         draw_text(font, text, x + offset, y - offset, make_vector4(0, 0, 0, 1));
         draw_text(font, text, x, y, make_vector4(1, 1, 1, 1));        
     }
