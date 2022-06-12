@@ -11,7 +11,7 @@ static f64 accumulated_dt;
 static f64 dt_for_draw;
 
 void draw_debug_info() {
-    f64 dt = core.time_info.current_dt;
+    f64 dt = globals.time_info.current_dt;
     
     num_seconds_since_last_update += dt;
     num_frames_since_last_update++;
@@ -23,7 +23,7 @@ void draw_debug_info() {
         accumulated_dt = 0.0;
         num_frames_since_last_update = 0;
     }
-    accumulated_dt += core.time_info.current_dt;
+    accumulated_dt += globals.time_info.current_dt;
     
     set_shader(shader_text);
     rendering_2d_right_handed();

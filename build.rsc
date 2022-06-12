@@ -31,7 +31,7 @@ libs {
 }
 
 headers {
-    src\core.h
+    src\general.h
     src\array.h
     src\os.h
     src\display.h

@@ -1,4 +1,4 @@
-#include "core.h"
+#include "general.h"
 #include "os.h"
 #include "display.h"
 #include "draw.h"
@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 
-Core core = {};
+Globals globals = {};
 
 Mesh *mesh;
 
@@ -23,8 +23,8 @@ Entity_Manager *get_entity_manager() {
 
 static void update_time() {
     f64 now_time = os_get_time();
-    core.time_info.current_dt = now_time - core.time_info.last_time;    
-    core.time_info.last_time = now_time;
+    globals.time_info.current_dt = now_time - globals.time_info.last_time;    
+    globals.time_info.last_time = now_time;
 }
 
 static void game_init();
@@ -39,10 +39,10 @@ int main(int argc, char **argv) {
         auto slash = find_character_from_right(exe, '/');
         slash += 1;
 
-        core.operating_folder = copy_string(exe);
-        core.operating_folder[get_string_length(exe) - get_string_length(slash)] = 0;
+        globals.operating_folder = copy_string(exe);
+        globals.operating_folder[get_string_length(exe) - get_string_length(slash)] = 0;
 
-        os_setcwd(core.operating_folder);
+        os_setcwd(globals.operating_folder);
     }
     
     display_init(1280, 720, "TM3D-DX11");
@@ -51,8 +51,8 @@ int main(int argc, char **argv) {
     mesh = load_obj("stall");
     mesh->map = find_or_create_texture("stall");
 
-    core.time_info.last_time = os_get_time();
-    core.time_info.current_dt = 0.0;
+    globals.time_info.last_time = os_get_time();
+    globals.time_info.current_dt = 0.0;
 
     game_init();
     main_loop();
@@ -61,15 +61,15 @@ int main(int argc, char **argv) {
 }
 
 static void main_loop() {
-    while (!core.should_quit) {
+    while (!globals.should_quit) {
         if (!display_is_open()) {
-            core.should_quit = true;
+            globals.should_quit = true;
             break;
         }
         os_poll_events();
         
         if (is_key_pressed(KEY_ESCAPE)) {
-            core.should_quit = true;
+            globals.should_quit = true;
             break;
         }
 
@@ -77,15 +77,15 @@ static void main_loop() {
             display_toggle_fullscreen();
         }
 
-        if (core.time_info.current_dt) {
-            if (core.program_mode == PROGRAM_MODE_GAME) {
+        if (globals.time_info.current_dt) {
+            if (globals.program_mode == PROGRAM_MODE_GAME) {
                 os_hide_cursor();
                 simulate_game();
             }
         }
 
-        if (core.time_info.current_dt) {
-            if (core.program_mode == PROGRAM_MODE_GAME) {
+        if (globals.time_info.current_dt) {
+            if (globals.program_mode == PROGRAM_MODE_GAME) {
                 draw_game_view();
             }
         }

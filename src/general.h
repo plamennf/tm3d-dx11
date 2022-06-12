@@ -1,5 +1,4 @@
-#ifndef CORE_H
-#define CORE_H
+#pragma once
 
 #include <stdint.h>
 #include <assert.h>
@@ -372,16 +371,14 @@ enum Program_Mode {
     PROGRAM_MODE_GAME,
 };
 
-struct Core {
+struct Globals {
     bool should_quit;
     char *operating_folder;
     Time_Info time_info;
     Program_Mode program_mode = PROGRAM_MODE_GAME;
 };
 
-extern Core core;
+extern Globals globals;
 
 struct Entity_Manager;
 Entity_Manager *get_entity_manager();
-
-#endif

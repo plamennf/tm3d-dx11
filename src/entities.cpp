@@ -3,7 +3,7 @@
 #include "input.h"
 
 void simulate_guy(Guy *guy) {
-    f32 dt = core.time_info.current_dt;
+    f32 dt = globals.time_info.current_dt;
     
     if (is_key_down(KEY_W)) {
         guy->current_speed = -guy->RUN_SPEED;

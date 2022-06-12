@@ -1,7 +1,7 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
-#include "core.h"
+#include "general.h"
 
 #include <math.h>
 

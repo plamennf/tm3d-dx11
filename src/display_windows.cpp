@@ -1,6 +1,6 @@
 #ifdef OS_WINDOWS
 
-#include "core.h"
+#include "general.h"
 #include "display.h"
 #include "draw.h"
 #include "input.h"
