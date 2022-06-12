@@ -92,16 +92,21 @@ void draw_menu() {
     //
     {
         int big_font_size = static_cast <int>(0.1f * render_target_height);
-        Font *big_font = get_font_at_size("KarminaBold.otf", big_font_size);
+        Font *big_font = get_font_at_size("KarminaBoldItalic.otf", big_font_size);
 
-        char *text = "TM3D-DX11";
+        char *text = "ThinMatrix's 3D OpenGL Series";
         int x = (render_target_width - get_string_width_in_pixels(big_font, text)) / 2;
         int y = static_cast <int>(0.85f * render_target_height);
+        draw_text(big_font, text, x, y, make_vector4(1.0f, 1.0f, 1.0f, 1.0f));
+
+        text = "ported to Direct3D 11";
+        x = (render_target_width - get_string_width_in_pixels(big_font, text)) / 2;
+        y -= big_font->character_height;
         draw_text(big_font, text, x, y, make_vector4(1.0f, 1.0f, 1.0f, 1.0f));
     }
 
     int font_size = static_cast <int>(0.05f * render_target_height);
-    Font *font = get_font_at_size("KarminaBoldItalic.otf", font_size);
+    Font *font = get_font_at_size("KarminaBold.otf", font_size);
     
     int start_y = static_cast <int>(0.55f * render_target_height);
     int y = start_y;
