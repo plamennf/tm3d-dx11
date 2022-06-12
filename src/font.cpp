@@ -79,6 +79,24 @@ Glyph *get_or_load_glyph(Font *font, int codepoint) {
     glyph->size_x = font->face->glyph->bitmap.width;
     glyph->size_y = font->face->glyph->bitmap.rows;
 
+    bool is_already_on_a_new_line = false;
+    if (font->bx + glyph->size_x > font->bw) {
+        font->by += font->character_height;
+        font->bx = 0;
+        is_already_on_a_new_line = true;
+    }
+
+    if (font->by > (font->bh - font->character_height)) {
+        Bitmap bitmap = {};
+        bitmap.width = font->bw;
+        bitmap.height = font->bh;
+        bitmap.format = TEXTURE_FORMAT_RGBA8;
+        
+        font->map = create_texture(bitmap);
+        font->by = 0;
+        font->bx = 0;
+    }
+    
     glyph->min_uv = make_vector2((float)font->bx, (float)font->by);
     glyph->max_uv = glyph->min_uv + make_vector2((float)glyph->size_x, (float)glyph->size_y);
 
@@ -100,14 +118,15 @@ Glyph *get_or_load_glyph(Font *font, int codepoint) {
     }
 
     update_texture(font->map, font->bx, font->by, glyph->size_x, glyph->size_y, data);
+    glyph->map = font->map;
+    
+    font->bx += glyph->size_x + 8;
 
-    font->bx += glyph->size_x + 4;
-
-    if (font->bx >= font->bw) {
+    if (!is_already_on_a_new_line && font->bx >= font->bw) {
         font->by += font->character_height;
         font->bx = 0;
     }
-
+    
     return glyph;
 }
 

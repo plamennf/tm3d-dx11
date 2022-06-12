@@ -12,6 +12,7 @@ struct Glyph {
     int bearing_x, bearing_y;
     Vector2 min_uv, max_uv;
     u32 advance;
+    Texture_Map *map;
 };
 
 struct Font {

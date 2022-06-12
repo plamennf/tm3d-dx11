@@ -45,7 +45,6 @@ void draw_text(Font *font, char *text, int x, int y, Vector4 color) {
     int orig_x = x;
 
     set_shader(shader_text);
-    set_diffuse_texture(font->map);
 
     immediate_begin();
 
@@ -61,6 +60,7 @@ void draw_text(Font *font, char *text, int x, int y, Vector4 color) {
             x = orig_x;
         } else {
             if ((codepoint != ' ') && (codepoint != '\t')) {
+                set_diffuse_texture(glyph->map);
                 draw_glyph(font, glyph, x, y, color);
             }
 
@@ -122,7 +122,7 @@ void draw_game_view() {
     Vector2 uv1 = make_vector2(1.0f, 1.0f);
     Vector2 uv2 = make_vector2(1.0f, 0.0f);
     Vector2 uv3 = make_vector2(0.0f, 0.0f);
-        
+    
     immediate_quad(p0, p1, p2, p3, uv0, uv1, uv2, uv3, make_vector4(1, 1, 1, 1));
     immediate_flush();
 }

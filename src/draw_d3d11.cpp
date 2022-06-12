@@ -61,6 +61,7 @@ Matrix4 object_to_proj_matrix;
 bool draw_is_initted = false;
 
 static Shader *current_shader;
+static Texture_Map *current_diffuse_map;
 static Texture_Map *current_render_target;
 static Texture_Map *current_depth_target;
 
@@ -163,6 +164,9 @@ static void create_offscreen_buffer(int width, int height) {
 void set_shader(Shader *shader) {
     if (current_shader == shader) return;
     assert(shader);
+
+    immediate_flush();
+    
     current_shader = shader;
 
     device_context->VSSetShader(shader->vertex_shader, nullptr, 0);
@@ -723,7 +727,12 @@ void rendering_2d_right_handed() {
 }
 
 void set_diffuse_texture(Texture_Map *map) {
+    if (current_diffuse_map == map) return;
+
+    immediate_flush();
+    
     device_context->PSSetShaderResources(0, 1, (ID3D11ShaderResourceView **)&map->srv);
+    current_diffuse_map = map;
 }
 
 Texture_Map *create_texture(Bitmap bitmap) {
