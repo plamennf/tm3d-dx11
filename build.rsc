@@ -62,6 +62,7 @@ files {
     src\input.cpp
     src\entities.cpp
     src\camera.cpp
+    src\menu.cpp
 }
 
 prebuildcmd: compile_shaders.bat

@@ -47,6 +47,8 @@ int main(int argc, char **argv) {
     
     display_init(1280, 720, "TM3D-DX11");
     init_draw(true, true, 4);
+
+    printf("Back buffer size: %dx%d\n", the_back_buffer->width, the_back_buffer->height);
     
     mesh = load_obj("stall");
     mesh->map = find_or_create_texture("stall");
@@ -62,24 +64,23 @@ int main(int argc, char **argv) {
 
 static void main_loop() {
     while (!globals.should_quit) {
-        if (!display_is_open()) {
-            globals.should_quit = true;
-            break;
-        }
         os_poll_events();
         
         if (is_key_pressed(KEY_ESCAPE)) {
-            globals.should_quit = true;
-            break;
+            toggle_menu();
         }
 
         if (is_key_pressed(KEY_F11)) {
             display_toggle_fullscreen();
         }
-
+        
         if (globals.time_info.current_dt) {
             if (globals.program_mode == PROGRAM_MODE_GAME) {
-                os_hide_cursor();
+                if (display_has_focus()) {
+                    os_hide_cursor();
+                } else {
+                    os_show_cursor();
+                }
                 simulate_game();
             }
         }
@@ -87,6 +88,9 @@ static void main_loop() {
         if (globals.time_info.current_dt) {
             if (globals.program_mode == PROGRAM_MODE_GAME) {
                 draw_game_view();
+            } else if (globals.program_mode == PROGRAM_MODE_MENU) {
+                void draw_menu();
+                draw_menu();
             }
         }
         

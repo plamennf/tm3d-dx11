@@ -11,11 +11,11 @@
 
 extern wchar_t *win32_utf8_to_utf16(char *string);
 
-static bool is_open = true;
 static int display_width;
 static int display_height;
 static HWND window_handle;
 static WINDOWPLACEMENT window_placement = { sizeof(window_placement) };
+static bool has_focus = true;
 
 extern Key_Info key_infos[NUM_KEYS];
 
@@ -23,8 +23,14 @@ static Key win32_vk_code_to_key(u32 vk_code) {
     switch (vk_code) {
     case VK_F11: return KEY_F11;
     case VK_ESCAPE: return KEY_ESCAPE;
+    case VK_RETURN: return KEY_ENTER;
 
     case VK_SPACE: return KEY_SPACE;
+
+    case VK_LEFT: return KEY_LEFT;
+    case VK_RIGHT: return KEY_RIGHT;
+    case VK_UP: return KEY_UP;
+    case VK_DOWN: return KEY_DOWN;
         
     case 'A': return KEY_A;
     case 'D': return KEY_D;
@@ -39,7 +45,7 @@ static LRESULT CALLBACK win32_window_callback(HWND hwnd, UINT msg, WPARAM wparam
 
     switch (msg) {
     case WM_CLOSE:
-        is_open = false;
+        globals.should_quit = true;
         break;
 
     case WM_SIZE: {
@@ -58,6 +64,18 @@ static LRESULT CALLBACK win32_window_callback(HWND hwnd, UINT msg, WPARAM wparam
         break;
     }
 
+    case WM_ACTIVATE: {
+        u32 state = (u32)wparam;
+
+        if (state == WA_ACTIVE || state == WA_CLICKACTIVE) {
+            has_focus = true;
+        } else if (state == WA_INACTIVE) {
+            has_focus = false;
+        }
+        
+        break;
+    }
+
     case WM_KEYDOWN:
     case WM_KEYUP:
     case WM_SYSKEYDOWN:
@@ -68,7 +86,12 @@ static LRESULT CALLBACK win32_window_callback(HWND hwnd, UINT msg, WPARAM wparam
         Key key = win32_vk_code_to_key(vk_code);
 
         Key_Info *info = &key_infos[key];
+        info->changed = is_down != info->is_down;
         info->is_down = is_down;
+        
+        if (is_down && vk_code == VK_F4 && GetKeyState(VK_MENU) & 0x8000) {
+            globals.should_quit = true;
+        }
         
         break;
     }
@@ -140,10 +163,6 @@ int display_get_height() {
     return display_height;
 }
 
-bool display_is_open() {
-    return is_open;
-}
-
 void *display_get_native_window() {
     return (void *)window_handle;
 }
@@ -166,6 +185,10 @@ void display_toggle_fullscreen() {
         SetWindowPos(window_handle, nullptr, 0, 0, 0, 0,
                      SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
     }
+}
+
+bool display_has_focus() {
+    return has_focus;
 }
 
 #endif

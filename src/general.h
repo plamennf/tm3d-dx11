@@ -369,6 +369,7 @@ struct Time_Info {
 
 enum Program_Mode {
     PROGRAM_MODE_GAME,
+    PROGRAM_MODE_MENU,
 };
 
 struct Globals {
@@ -379,6 +380,8 @@ struct Globals {
 };
 
 extern Globals globals;
+
+void toggle_menu();
 
 struct Entity_Manager;
 Entity_Manager *get_entity_manager();

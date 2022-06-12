@@ -7,5 +7,9 @@ bool is_key_down(Key key) {
 }
 
 bool is_key_pressed(Key key) {
+    return key_infos[key].is_down && key_infos[key].changed;
+}
+
+bool was_key_pressed(Key key) {
     return key_infos[key].was_down && !key_infos[key].is_down;
 }

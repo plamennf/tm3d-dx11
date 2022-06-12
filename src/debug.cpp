@@ -45,7 +45,7 @@ void draw_debug_info() {
     }
 
     y -= font->character_height;
-
+    
     {
         Time time = os_get_local_time();
         

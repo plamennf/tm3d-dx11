@@ -90,6 +90,7 @@ char *os_read_entire_file(char *filepath, s64 *out_length) {
 void os_poll_events() {
     for (int i = 0; i < NUM_KEYS; i++) {
         key_infos[i].was_down = key_infos[i].is_down;
+        key_infos[i].changed = false;
     }
     
     MSG msg;
@@ -164,6 +165,7 @@ void os_hide_cursor() {
 void os_show_cursor() {
     HCURSOR cursor_handle = LoadCursorW(nullptr, IDC_ARROW);
     SetCursor(cursor_handle);
+    ClipCursor(nullptr);
 }
 
 #endif
