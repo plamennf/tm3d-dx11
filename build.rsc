@@ -47,6 +47,8 @@ headers {
     src\entities.h
     src\camera.h
     src\hash_table.h
+    src\config.h
+    src\text_file_handler.h
 }
 
 files {
@@ -63,6 +65,8 @@ files {
     src\entities.cpp
     src\camera.cpp
     src\menu.cpp
+    src\config.cpp
+    src\text_file_handler.cpp
 }
 
 prebuildcmd: compile_shaders.bat

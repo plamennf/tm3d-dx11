@@ -29,6 +29,8 @@ extern Texture_Map *the_back_depth_buffer;
 
 extern Texture_Map *the_offscreen_buffer;
 extern Texture_Map *the_offscreen_depth_buffer;
+extern int default_offscreen_buffer_width;
+extern int default_offscreen_buffer_height;
 
 extern int render_target_width;
 extern int render_target_height;
@@ -49,6 +51,7 @@ extern Shader *shader_text;
 void init_draw(bool vsync, bool multisample, int sample_count);
 void swap_buffers();
 void resize_render_targets(int width, int height);
+void resize_offscreen_buffer(int width, int height);
 
 void clear_render_target(f32 r, f32 g, f32 b, f32 a);
 

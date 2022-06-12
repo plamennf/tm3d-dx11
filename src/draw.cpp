@@ -80,51 +80,10 @@ void draw_text(Font *font, char *text, int x, int y, Vector4 color) {
 }
 
 void draw_game_view() {
-    set_render_target(the_offscreen_buffer);
-    set_depth_target(the_offscreen_depth_buffer);
-
     clear_render_target(0.2f, 0.5f, 0.8f, 1.0f);
 
     draw_game_3d();
     draw_game_2d();
-    
-    set_render_target(the_back_buffer);
-    set_depth_target(the_back_depth_buffer);
-
-    clear_render_target(0.0f, 0.0f, 0.0f, 1.0f);
-    
-    extern bool multisampling;
-    extern int num_samples;
-    if (multisampling) {
-        if (num_samples == 2) {
-            set_shader(shader_msaa_2x);
-        } else if (num_samples == 4) {
-            set_shader(shader_msaa_4x);
-        } else if (num_samples == 8) {
-            set_shader(shader_msaa_8x);
-        }
-    } else {
-        set_shader(shader_texture);
-    }
-
-    rendering_2d_right_handed();
-    
-    set_diffuse_texture(the_offscreen_buffer);
-    
-    immediate_begin();
-    
-    Vector2 p0 = make_vector2(0.0f, 0.0f);
-    Vector2 p1 = make_vector2((float)render_target_width, 0.0f);
-    Vector2 p2 = make_vector2((float)render_target_width, (float)render_target_height);
-    Vector2 p3 = make_vector2(0.0f, (float)render_target_height);
-
-    Vector2 uv0 = make_vector2(0.0f, 1.0f);
-    Vector2 uv1 = make_vector2(1.0f, 1.0f);
-    Vector2 uv2 = make_vector2(1.0f, 0.0f);
-    Vector2 uv3 = make_vector2(0.0f, 0.0f);
-    
-    immediate_quad(p0, p1, p2, p3, uv0, uv1, uv2, uv3, make_vector4(1, 1, 1, 1));
-    immediate_flush();
 }
 
 static void draw_game_3d() {

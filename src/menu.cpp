@@ -6,12 +6,14 @@
 
 enum Menu_Item {
     MENU_RESUME,
+    MENU_RENDER_SCALE,
     MENU_QUIT,
     NUM_MENU_ITEMS,
 };
 
 static bool asking_for_quit_confirmation;
 static int current_menu_choice;
+float render_scale_to_draw = 1.0f;
 
 void toggle_menu() {
     if (globals.program_mode == PROGRAM_MODE_GAME) {
@@ -37,6 +39,13 @@ static void handle_enter() {
         toggle_menu();
         break;
 
+    case MENU_RENDER_SCALE: {
+        int width = static_cast <int>(render_scale_to_draw * default_offscreen_buffer_width);
+        int height = static_cast <int>(render_scale_to_draw * default_offscreen_buffer_height);
+        resize_offscreen_buffer(width, height);
+        break;
+    }
+
     case MENU_QUIT:
         if (asking_for_quit_confirmation) globals.should_quit = true;
         else asking_for_quit_confirmation = true;
@@ -61,10 +70,18 @@ void draw_menu() {
     if (is_key_pressed(KEY_UP)) advance_menu_choice(-1);
     if (is_key_pressed(KEY_DOWN)) advance_menu_choice(+1);
 
+    if (current_menu_choice == MENU_RENDER_SCALE) {
+        if (is_key_pressed(KEY_LEFT)) {
+            render_scale_to_draw -= 0.01f;
+            if (render_scale_to_draw < 0.1f) render_scale_to_draw = 0.1f;
+        } else if (is_key_pressed(KEY_RIGHT)) {
+            render_scale_to_draw += 0.01f;
+            if (render_scale_to_draw > 1.0f) render_scale_to_draw = 1.0f;
+        }
+    }
+    
     if (is_key_pressed(KEY_ENTER)) handle_enter();
     
-    set_render_target(the_back_buffer);
-    set_depth_target(the_back_depth_buffer);
     clear_render_target(0.0f, 0.0f, 0.0f, 1.0f);
     
     set_shader(shader_text);
@@ -92,6 +109,11 @@ void draw_menu() {
     char *text = "Resume";
     draw_item(font, text, y, MENU_RESUME);
     y -= font->character_height;
+
+    text = mprintf("Render scale: %.2f", render_scale_to_draw);
+    draw_item(font, text, y, MENU_RENDER_SCALE);
+    y -= font->character_height;
+    delete [] text;
 
     text = "Quit";
     if (asking_for_quit_confirmation) text = "Quit? Are you sure?";

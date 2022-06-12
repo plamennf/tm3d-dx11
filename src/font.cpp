@@ -25,8 +25,8 @@ Font *load_font(char *full_path, int size) {
     result->character_height = size;
 
     result->bx = result->by = 0;
-    result->bw = result->bh = 1024;
-
+    result->bw = result->bh = 1024 + ((size / 1000) * 1024);
+    
     Bitmap bitmap = {};
     bitmap.width = result->bw;
     bitmap.height = result->bh;

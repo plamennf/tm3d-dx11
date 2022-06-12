@@ -49,6 +49,8 @@ Texture_Map *the_back_depth_buffer;
 
 Texture_Map *the_offscreen_buffer;
 Texture_Map *the_offscreen_depth_buffer;
+int default_offscreen_buffer_width;
+int default_offscreen_buffer_height;
 
 int render_target_width = 0;
 int render_target_height = 0;
@@ -154,11 +156,27 @@ static void destroy_offscreen_buffer() {
         ((ID3D11Texture2D *)the_offscreen_depth_buffer->srv)->Release();
         the_offscreen_buffer->srv = nullptr;
     }
+
+    delete the_offscreen_buffer;
+    delete the_offscreen_depth_buffer;
 }
 
 static void create_offscreen_buffer(int width, int height) {
     the_offscreen_buffer = create_texture_rendertarget(width, height, multisampling, num_samples);
     the_offscreen_depth_buffer = create_texture_depthtarget(the_offscreen_buffer);
+}
+
+void resize_offscreen_buffer(int width, int height) {
+    bool reset_current_render_target = current_render_target == the_offscreen_buffer;
+    bool reset_current_depth_target = current_depth_target == the_offscreen_depth_buffer;
+    destroy_offscreen_buffer();
+    create_offscreen_buffer(width, height);
+    if (reset_current_render_target) {
+        set_render_target(the_offscreen_buffer);
+    }
+    if (reset_current_depth_target) {
+        set_depth_target(the_offscreen_depth_buffer);
+    }
 }
 
 void set_shader(Shader *shader) {
@@ -289,7 +307,9 @@ void init_draw(bool vsync, bool multisample, int sample_count) {
     
     create_render_target();
     create_offscreen_buffer(the_back_buffer->width, the_back_buffer->height);
-
+    default_offscreen_buffer_width = the_back_buffer->width;
+    default_offscreen_buffer_height = the_back_buffer->height;
+    
     D3D11_RASTERIZER_DESC1 rasterizer_desc = {};
     rasterizer_desc.FillMode = D3D11_FILL_SOLID;
     rasterizer_desc.CullMode = D3D11_CULL_BACK;
@@ -437,6 +457,8 @@ void resize_render_targets(int width, int height) {
 
     the_back_buffer->width = width;
     the_back_buffer->height = height;
+    default_offscreen_buffer_width = the_back_buffer->width;
+    default_offscreen_buffer_height = the_back_buffer->height;
 }
 
 void make_buffers_for_mesh(Mesh *mesh, u32 num_vertices, Mesh_Vertex *buffer, u32 num_indices, u32 *indices) {

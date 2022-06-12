@@ -8,6 +8,7 @@
 #include "input.h"
 #include "entities.h"
 #include "hash_table.h"
+#include "config.h"
 
 #include <stdio.h>
 
@@ -45,9 +46,20 @@ int main(int argc, char **argv) {
         os_setcwd(globals.operating_folder);
     }
     
+    Config config = load_config();
+    {
+        extern float render_scale_to_draw; // From menu.cpp
+        render_scale_to_draw = config.render_scale;
+    }
+    
     display_init(1280, 720, "TM3D-DX11");
     init_draw(true, true, 4);
-
+    {
+        int width = static_cast <int>(config.render_scale * default_offscreen_buffer_width);
+        int height = static_cast <int>(config.render_scale * default_offscreen_buffer_height);
+        resize_offscreen_buffer(width, height);
+    }
+    
     printf("Back buffer size: %dx%d\n", the_back_buffer->width, the_back_buffer->height);
     
     mesh = load_obj("stall");
@@ -85,19 +97,64 @@ static void main_loop() {
             }
         }
 
-        if (globals.time_info.current_dt) {
-            if (globals.program_mode == PROGRAM_MODE_GAME) {
-                draw_game_view();
-            } else if (globals.program_mode == PROGRAM_MODE_MENU) {
-                void draw_menu();
-                draw_menu();
+        if (the_offscreen_buffer && the_offscreen_depth_buffer) {
+            set_render_target(the_offscreen_buffer);
+            set_depth_target(the_offscreen_depth_buffer);
+            if (globals.time_info.current_dt) {
+                if (globals.program_mode == PROGRAM_MODE_GAME) {
+                    draw_game_view();
+                } else if (globals.program_mode == PROGRAM_MODE_MENU) {
+                    void draw_menu();
+                    draw_menu();
+                }
+            }
+            {
+                set_render_target(the_back_buffer);
+                set_depth_target(the_back_depth_buffer);
+
+                clear_render_target(0.0f, 0.0f, 0.0f, 1.0f);
+    
+                extern bool multisampling;
+                extern int num_samples;
+                if (multisampling) {
+                    if (num_samples == 2) {
+                        set_shader(shader_msaa_2x);
+                    } else if (num_samples == 4) {
+                        set_shader(shader_msaa_4x);
+                    } else if (num_samples == 8) {
+                        set_shader(shader_msaa_8x);
+                    }
+                } else {
+                    set_shader(shader_texture);
+                }
+
+                rendering_2d_right_handed();
+    
+                set_diffuse_texture(the_offscreen_buffer);
+    
+                immediate_begin();
+    
+                Vector2 p0 = make_vector2(0.0f, 0.0f);
+                Vector2 p1 = make_vector2((float)render_target_width, 0.0f);
+                Vector2 p2 = make_vector2((float)render_target_width, (float)render_target_height);
+                Vector2 p3 = make_vector2(0.0f, (float)render_target_height);
+
+                Vector2 uv0 = make_vector2(0.0f, 1.0f);
+                Vector2 uv1 = make_vector2(1.0f, 1.0f);
+                Vector2 uv2 = make_vector2(1.0f, 0.0f);
+                Vector2 uv3 = make_vector2(0.0f, 0.0f);
+    
+                immediate_quad(p0, p1, p2, p3, uv0, uv1, uv2, uv3, make_vector4(1, 1, 1, 1));
+                immediate_flush();
             }
         }
-        
+            
         swap_buffers();
         
         update_time();
     }
+
+    save_config();
 }
 
 static void game_init() {
