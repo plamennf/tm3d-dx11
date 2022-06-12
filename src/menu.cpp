@@ -26,11 +26,14 @@ void toggle_menu() {
 }
 
 static void advance_menu_choice(int delta) {
-    asking_for_quit_confirmation = false;
-    
+    int prev_menu_choice = current_menu_choice;
     current_menu_choice += delta;
     if (current_menu_choice < 0) current_menu_choice = 0;
     else if (current_menu_choice >= NUM_MENU_ITEMS) current_menu_choice = NUM_MENU_ITEMS - 1;
+
+    if (prev_menu_choice != current_menu_choice) {
+        asking_for_quit_confirmation = false;
+    }
 }
 
 static void handle_enter() {

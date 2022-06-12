@@ -60,8 +60,6 @@ int main(int argc, char **argv) {
         resize_offscreen_buffer(width, height);
     }
     
-    printf("Back buffer size: %dx%d\n", the_back_buffer->width, the_back_buffer->height);
-    
     mesh = load_obj("stall");
     mesh->map = find_or_create_texture("stall");
 
