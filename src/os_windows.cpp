@@ -191,4 +191,20 @@ void os_show_cursor() {
     ClipCursor(nullptr);
 }
 
+void os_get_mouse_pointer_position(int *x, int *y, bool flipped) {
+    POINT pt;
+    GetCursorPos(&pt);
+
+    extern HWND window_handle;
+    ScreenToClient(window_handle, &pt);
+
+    RECT rect;
+    GetClientRect(window_handle, &rect);
+    int height = rect.bottom - rect.top;
+    pt.y = height - pt.y;
+
+    if (x) *x = pt.x;
+    if (y) *y = pt.y;
+}
+
 #endif

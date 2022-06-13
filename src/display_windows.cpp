@@ -13,7 +13,7 @@ extern wchar_t *win32_utf8_to_utf16(char *string);
 
 static int display_width;
 static int display_height;
-static HWND window_handle;
+HWND window_handle;
 static WINDOWPLACEMENT window_placement = { sizeof(window_placement) };
 static bool has_focus = true;
 

@@ -25,4 +25,6 @@ void os_setcwd(char *dir);
 void os_hide_cursor();
 void os_show_cursor();
 
+void os_get_mouse_pointer_position(int *x, int *y, bool flipped = true);
+
 #endif
