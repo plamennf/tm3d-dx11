@@ -1,0 +1,3 @@
+- For win32 .rc files
+  - run rc /l 0x0409 /nologo /fo"..\run_tree\tm3d-dx11.res" ..\src\tm3d-dx11.res
+  - add tm3d-dx11.res to the linker line

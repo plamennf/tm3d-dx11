@@ -78,7 +78,9 @@ static IDXGISwapChain1 *swap_chain;
 static ID3D11RenderTargetView *back_buffer_rtv;
 static ID3D11DepthStencilView *back_buffer_dsv;
 
-static ID3D11RasterizerState1 *rasterizer_state;
+static bool scissor_enabled;
+static ID3D11RasterizerState1 *rasterizer_scissor_enabled;
+static ID3D11RasterizerState1 *rasterizer_scissor_disabled;
 
 static ID3D11DepthStencilState *depth_test_enabled_depth_write_enabled;
 static ID3D11DepthStencilState *depth_test_enabled_depth_write_disabled;
@@ -317,8 +319,10 @@ void init_draw(bool vsync, bool multisample, int sample_count) {
     if (multisample && num_samples > 1) {
         rasterizer_desc.MultisampleEnable = true;
     }
-    device->CreateRasterizerState1(&rasterizer_desc, &rasterizer_state);
-
+    device->CreateRasterizerState1(&rasterizer_desc, &rasterizer_scissor_disabled);
+    rasterizer_desc.ScissorEnable = true;
+    device->CreateRasterizerState1(&rasterizer_desc, &rasterizer_scissor_enabled);
+    
     D3D11_DEPTH_STENCIL_DESC depth_stencil_desc = {};
     depth_stencil_desc.DepthEnable = TRUE;
     depth_stencil_desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
@@ -437,7 +441,7 @@ void init_draw(bool vsync, bool multisample, int sample_count) {
     immediate_vertices = new Immediate_Vertex[MAX_IMMEDIATE_VERTICES];
     num_immediate_vertices = 0;
     
-    device_context->RSSetState(rasterizer_state);
+    device_context->RSSetState(rasterizer_scissor_disabled);
     device_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     view_to_proj_matrix = matrix4_identity();
@@ -842,6 +846,28 @@ void update_texture(Texture_Map *map, int x, int y, int width, int height, u8 *d
     box.back = 1;
     
     device_context->UpdateSubresource(tex, 0, &box, data, width * num_channels * sizeof(u8), 0);
+}
+
+void set_scissor(int x, int y, int width, int height) {
+    if (scissor_enabled) return;
+
+    device_context->RSSetState(rasterizer_scissor_enabled);
+    
+    D3D11_RECT rect;
+    rect.left = x;
+    rect.right = rect.left + width;
+    rect.top = y;
+    rect.bottom = rect.top + height;
+    
+    device_context->RSSetScissorRects(1, &rect);
+    
+    scissor_enabled = true;
+}
+
+void clear_scissor() {
+    if (!scissor_enabled) return;
+    device_context->RSSetState(rasterizer_scissor_disabled);
+    scissor_enabled = false;
 }
 
 #endif

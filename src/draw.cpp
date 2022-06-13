@@ -113,7 +113,7 @@ static void draw_game_2d() {
         rendering_2d_right_handed();
         
         const f32 BIG_FONT_SIZE = 0.0725f;
-        int font_size = (int) ((BIG_FONT_SIZE * 1.4f) * render_target_height);
+        int font_size = static_cast <int>((BIG_FONT_SIZE * 1.4f) * render_target_height);
         Font *big_font = get_font_at_size("Inconsolata-Regular.ttf", font_size);
         
         char *text = ".";

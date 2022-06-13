@@ -81,6 +81,9 @@ void set_diffuse_texture(Texture_Map *map);
 void refresh_transform();
 void rendering_2d_right_handed();
 
+void set_scissor(int x, int y, int width, int height);
+void clear_scissor();
+
 void draw_text(struct Font *font, char *text, int x, int y, Vector4 color);
 
 void draw_mesh(Mesh *mesh, Vector3 position, Vector3 rotation, f32 scale);
