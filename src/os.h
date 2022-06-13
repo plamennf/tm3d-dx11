@@ -16,6 +16,7 @@ double os_get_time();
 
 char *os_read_entire_file(char *filepath, s64 *out_length = nullptr);
 bool os_file_exists(char *filepath);
+void os_get_last_write_time(char *file_path, u64 *out_time);
 
 void os_poll_events();
 

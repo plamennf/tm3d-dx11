@@ -207,4 +207,25 @@ void os_get_mouse_pointer_position(int *x, int *y, bool flipped) {
     if (y) *y = pt.y;
 }
 
+void os_get_last_write_time(char *file_path, u64 *out_time) {
+    HANDLE file = CreateFileA(file_path, GENERIC_READ,
+                              FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE, nullptr,
+                              OPEN_EXISTING, 0, nullptr);
+    if (file == INVALID_HANDLE_VALUE)
+        return;
+
+    FILETIME ft_create, ft_access, ft_write;
+
+    if (!GetFileTime(file, &ft_create, &ft_access, &ft_write))
+        return;
+
+    ULARGE_INTEGER uli;
+    uli.LowPart = ft_write.dwLowDateTime;
+    uli.HighPart = ft_write.dwHighDateTime;
+    
+    *out_time = uli.QuadPart;
+
+    CloseHandle(file);
+}
+
 #endif

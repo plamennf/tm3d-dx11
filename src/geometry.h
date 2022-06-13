@@ -20,6 +20,48 @@ inline Vector2 make_vector2(f32 x, f32 y) {
     return result;
 }
 
+inline Vector2 rotate(Vector2 v, float rotation) {
+    float st = sinf(rotation);
+    float ct = cosf(rotation);
+
+    float nx = v.x * ct - v.y * st;
+    float ny = v.x * st + v.y * ct;
+
+    return { nx, ny };
+}
+
+inline float get_length_squared(Vector2 v) {
+    return v.x*v.x+v.y*v.y;
+}
+
+inline float get_length(Vector2 v) {
+    return sqrtf(get_length_squared(v));
+}
+    
+inline Vector2 normalize(Vector2 v) {
+    float multiplier = 1.0f / get_length(v);
+    v.x *= multiplier;
+    v.y *= multiplier;
+    return v;
+}
+
+inline Vector2 normalize_or_zero(Vector2 v) {
+    Vector2 result = {};
+    
+    float length_squared = get_length_squared(v);
+    if (length_squared > 0.0001f * 0.0001f) {
+        float multiplier = 1.0f / sqrtf(length_squared);
+        result.x = v.x * multiplier;
+        result.y = v.y * multiplier;
+    }
+
+    return result;
+}
+
+inline Vector2 componentwise_product(Vector2 left, Vector2 right) {
+    return make_vector2(left.x * right.x, left.y * right.y);
+}
+
 inline Vector2 operator+(Vector2 a, Vector2 b) {
     Vector2 result;
 
@@ -27,6 +69,79 @@ inline Vector2 operator+(Vector2 a, Vector2 b) {
     result.y = a.y + b.y;
 
     return result;
+}
+
+inline Vector2 operator-(Vector2 left, Vector2 right) {
+    return make_vector2(left.x - right.x, left.y - right.y);
+}
+
+inline Vector2 operator*(Vector2 left, float right) {
+    return make_vector2(left.x * right, left.y * right);
+}
+
+inline Vector2 operator*(float right, Vector2 left) {
+    return make_vector2(left.x * right, left.y * right);
+}
+
+inline Vector2 operator/(Vector2 left, Vector2 right) {
+    return make_vector2(left.x / right.x, left.y / right.y);
+}
+
+inline Vector2 &operator*=(Vector2 &left, float right) {
+    left.x *= right;
+    left.y *= right;
+    return left;
+}
+
+inline Vector2 &operator*=(Vector2 &left, Vector2 right) {
+    left.x *= right.x;
+    left.y *= right.y;
+    return left;
+}
+
+inline Vector2 &operator/=(Vector2 &left, float right) {
+    left.x /= right;
+    left.y /= right;
+    return left;
+}
+    
+inline Vector2 &operator/=(Vector2 &left, Vector2 right) {
+    left.x /= right.x;
+    left.y /= right.y;
+    return left;
+}
+
+inline Vector2 &operator-=(Vector2 &left, float right) {
+    left.x -= right;
+    left.y -= right;
+    return left;
+}
+    
+inline Vector2 &operator-=(Vector2 &left, Vector2 right) {
+    left.x -= right.x;
+    left.y -= right.y;
+    return left;
+}
+
+inline Vector2 &operator+=(Vector2 &left, float right) {
+    left.x += right;
+    left.y += right;
+    return left;
+}
+    
+inline Vector2 &operator+=(Vector2 &left, Vector2 right) {
+    left.x += right.x;
+    left.y += right.y;
+    return left;
+}
+
+inline Vector2 lerp(Vector2 a, Vector2 b, float t) {
+    Vector2 result = (1.0f - t) * a + t * b;
+}
+
+inline float distance(Vector2 a, Vector2 b) {
+    Vector2 dir = a - b;
+    return get_length(dir);
 }
 
 union Vector3 {
@@ -42,6 +157,11 @@ inline Vector3 make_vector3(f32 x, f32 y, f32 z) {
     result.y = y;
     result.z = z;
 
+    return result;
+}
+
+inline Vector3 operator+(Vector3 left, Vector3 right) {
+    Vector3 result = make_vector3(left.x + right.x, left.y + right.y, left.z + right.z);
     return result;
 }
 
@@ -180,6 +300,25 @@ inline Matrix4 make_z_rotation(f32 t) {
     result._22 = ct;
     
     return result;
+}
+
+struct Rectangle2i {
+    int x, y, width, height;
+};
+
+inline int get_max_x(Rectangle2i rect) {
+    return rect.x + rect.width;
+}
+
+inline int get_max_y(Rectangle2i rect) {
+    return rect.y + rect.height;
+}
+
+inline Vector2 get_vec2(float theta) {
+    float ct = cosf(theta);
+    float st = sinf(theta);
+
+    return make_vector2(ct, st);
 }
 
 #endif
