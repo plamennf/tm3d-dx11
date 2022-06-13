@@ -2,7 +2,7 @@
 #define HASH_TABLE_H
 
 #include <assert.h>
-#include <new>
+#include <stdlib.h>
 
 static int hash(int x) {
     x = ((x >> 16) ^ x) * 0x45d9f3b;
@@ -28,55 +28,47 @@ struct Hash_Table {
         Key key;
         Value value;
     };
-    
-    int allocated = 0;
-    int count = 0;
+
     Bucket *buckets = nullptr;
     bool *occupancy_mask = nullptr;
+    int allocated = 0;
+    int count = 0;
 
-    inline ~Hash_Table() {
-        if (buckets) {
-            ::operator delete(buckets, allocated * sizeof(Bucket));
-            buckets = nullptr;
+    inline void grow() {
+        const int HASH_TABLE_INITIAL_CAPACITY = 256;
+
+        if (!buckets) {
+            assert(allocated == 0);
+            assert(count == 0);
+            
+            buckets = (Bucket *)calloc(HASH_TABLE_INITIAL_CAPACITY, sizeof(Bucket));
+            occupancy_mask = (bool *)calloc(HASH_TABLE_INITIAL_CAPACITY, sizeof(bool));
+            allocated = HASH_TABLE_INITIAL_CAPACITY;
+            count = 0;
+        } else {
+            Hash_Table <Key, Value> new_hash_table = {
+                (Bucket *)calloc(allocated * 2, sizeof(Bucket)),
+                (bool *)calloc(allocated * 2, sizeof(bool)),
+                allocated * 2,
+                0,
+            };
+
+            for (int i = 0; i < count; i++) {
+                if (occupancy_mask[i]) {
+                    new_hash_table.add(buckets[i].key, buckets[i].value);
+                }
+            }
+
+            free(buckets);
+            free(occupancy_mask);
+
+            *this = new_hash_table;
         }
-
-        if (occupancy_mask) {
-            ::operator delete(occupancy_mask, allocated * sizeof(bool));
-            occupancy_mask = nullptr;
-        }
-    }
-    
-    inline void resize(int newSize) {
-        Bucket *new_block = (Bucket *)::operator new(newSize * sizeof(Bucket));
-        bool *new_occupancies = (bool *)::operator new(newSize * sizeof(bool));
-        memset(new_occupancies, 0, newSize * sizeof(bool));
-        
-        if (newSize < count) {
-            count = newSize;
-        }
-
-        for (int i = 0; i < count; i++) {
-            new_block[i] = buckets[i];
-            new_occupancies[i] = occupancy_mask[i];
-        }
-
-        if (buckets) {
-            ::operator delete(buckets, allocated * sizeof(Bucket));
-            ::operator delete(occupancy_mask, allocated * sizeof(bool));
-        }
-
-        buckets = new_block;
-        occupancy_mask = new_occupancies;
-
-        allocated = newSize;
     }
 
     inline void add(Key key, Value value) {
         if (count >= allocated) {
-            if (!allocated) {
-                allocated = 16;
-            }
-            resize(allocated * 2);
+            grow();
         }
 
         auto hk = hash(key) & (allocated - 1);
@@ -85,133 +77,40 @@ struct Hash_Table {
         }
 
         occupancy_mask[hk] = true;
-
         buckets[hk].key = key;
         buckets[hk].value = value;
-
         count++;
     }
 
-    inline void add(Key key) {
-        Value value = {};
-        add(key, value);
-    }
-
-    Value &get(Key key) {
+    inline Value *get(Key key) {
         auto hk = hash(key) & (allocated - 1);
         for (int i = 0; i < allocated && occupancy_mask[hk] && buckets[hk].key != key; i++) {
-            hk = (hk + 1) & (allocated - 1);            
-        }
-
-        return buckets[hk].value;
-    }
-
-    bool contains(Key key) {
-        if (!allocated) return 0;
-        
-        auto hk = hash(key) & (allocated - 1);
-        for (int i = 0; i < allocated && occupancy_mask[hk] && buckets[hk].key != key; i++) {
-            hk = (hk + 1) & (allocated - 1);            
-        }
-
-        return occupancy_mask[hk];
-    }
-};
-
-template <typename Value>
-struct String_Hash_Table {
-    struct Bucket {
-        char *key;
-        Value value;
-    };
-    
-    int allocated = 0;
-    int count = 0;
-    Bucket *buckets = nullptr;
-    bool *occupancy_mask = nullptr;
-
-    inline ~String_Hash_Table() {
-        if (buckets) {
-            ::operator delete(buckets, allocated * sizeof(Bucket));
-            buckets = nullptr;
-        }
-
-        if (occupancy_mask) {
-            ::operator delete(occupancy_mask, allocated * sizeof(bool));
-            occupancy_mask = nullptr;
-        }
-    }
-    
-    inline void resize(int newSize) {
-        Bucket *new_block = (Bucket *)::operator new(newSize * sizeof(Bucket));
-        bool *new_occupancies = (bool *)::operator new(newSize * sizeof(bool));
-        memset(new_occupancies, 0, newSize * sizeof(bool));
-        
-        if (newSize < count) {
-            count = newSize;
-        }
-
-        for (int i = 0; i < count; i++) {
-            new_block[i] = buckets[i];
-            new_occupancies[i] = occupancy_mask[i];
-        }
-
-        if (buckets) {
-            ::operator delete(buckets, allocated * sizeof(Bucket));
-            ::operator delete(occupancy_mask, allocated * sizeof(bool));
-        }
-
-        buckets = new_block;
-        occupancy_mask = new_occupancies;
-
-        allocated = newSize;
-    }
-
-    inline void add(char *key, Value value) {
-        if (count >= allocated) {
-            if (!allocated) {
-                allocated = 16;
-            }
-            resize(allocated * 2);
-        }
-
-        extern bool strings_match(char *a, char *b);
-        
-        auto hk = hash(key) & (allocated - 1);
-        while (occupancy_mask[hk] && !strings_match(buckets[hk].key, key)) {
             hk = (hk + 1) & (allocated - 1);
         }
 
-        occupancy_mask[hk] = true;
-
-        buckets[hk].key = copy_string(key);
-        buckets[hk].value = value;
-
-        count++;
+        if (buckets && occupancy_mask[hk] && buckets[hk].key == key) {
+            return &buckets[hk].value;
+        } else {
+            return nullptr;
+        }
     }
 
-    Value &get(char *key) {
-        extern bool strings_match(char *a, char *b);
-        
-        auto hk = hash(key) & (allocated - 1);
-        for (int i = 0; i < allocated && occupancy_mask[hk] && !strings_match(buckets[hk].key, key); i++) {
-            hk = (hk + 1) & (allocated - 1);            
-        }
-
-        return buckets[hk].value;
+    inline bool contains(Key key) {
+        return get(key);
     }
 
-    bool contains(char *key) {
-        if (!allocated) return 0;
-
-        extern bool strings_match(char *a, char *b);
-        
-        auto hk = hash(key) & (allocated - 1);
-        for (int i = 0; i < allocated && occupancy_mask[hk] && !strings_match(buckets[hk].key, key); i++) {
-            hk = (hk + 1) & (allocated - 1);            
+    Value *operator[](Key key) {
+        {
+            Value *maybe_value = get(key);
+            if (!maybe_value) {
+                add(key, {});
+            } else {
+                return maybe_value;
+            }
         }
-
-        return occupancy_mask[hk];
+        Value *maybe_value = get(key);
+        assert(maybe_value);
+        return maybe_value;
     }
 };
 

@@ -56,12 +56,7 @@ Font *get_font_at_size(char *short_name, int size) {
 }
 
 Glyph *get_or_load_glyph(Font *font, int codepoint) {
-    Glyph *glyph = nullptr;
-    bool glyph_exists = font->glyphs.contains(codepoint);
-    if (!glyph_exists) {
-        font->glyphs.add(codepoint);
-    }
-    glyph = &font->glyphs.get(codepoint);
+    Glyph *glyph = font->glyphs[codepoint];
     
     if (glyph->height == font->character_height) return glyph;
 
@@ -74,11 +69,11 @@ Glyph *get_or_load_glyph(Font *font, int codepoint) {
     
     glyph->height = font->character_height;
     
-    if (codepoint == ' ' || codepoint == '\n' || codepoint == '\t') return glyph;
+    if (is_whitespace(codepoint)) return glyph;
     
     glyph->size_x = font->face->glyph->bitmap.width;
     glyph->size_y = font->face->glyph->bitmap.rows;
-
+    
     bool is_already_on_a_new_line = false;
     if (font->bx + glyph->size_x > font->bw) {
         font->by += font->character_height;
@@ -86,7 +81,7 @@ Glyph *get_or_load_glyph(Font *font, int codepoint) {
         is_already_on_a_new_line = true;
     }
 
-    if (font->by > (font->bh - font->character_height)) {
+    if (font->by > font->bh - font->character_height) {
         Bitmap bitmap = {};
         bitmap.width = font->bw;
         bitmap.height = font->bh;
@@ -109,7 +104,7 @@ Glyph *get_or_load_glyph(Font *font, int codepoint) {
         for (int x = 0; x < glyph->size_x; x++) {
             u8 source = font->face->glyph->bitmap.buffer[y * glyph->size_x + x];
             u8 *dest = &data[(y * glyph->size_x + x) * 4];
-
+            
             dest[0] = 255;
             dest[1] = 255;
             dest[2] = 255;
@@ -150,7 +145,7 @@ int get_string_width_in_pixels(Font *font, char *text) {
         Glyph *glyph = get_or_load_glyph(font, codepoint);
         
         width += glyph->advance;
-
+        
         if (font->has_kerning) {
             int next_codepoint_byte_count = 0;
             int next_codepoint = get_codepoint(at + codepoint_byte_count, &next_codepoint_byte_count);

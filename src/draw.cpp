@@ -22,11 +22,11 @@ static void draw_game_3d();
 static void draw_game_2d();
 
 static void draw_glyph(Font *font, Glyph *glyph, int x, int y, Vector4 color) {
-    f32 xpos = (f32) (x + glyph->bearing_x);
-    f32 ypos = (f32) (y - (glyph->size_y - glyph->bearing_y));
+    float xpos = static_cast <float>(x + glyph->bearing_x);
+    float ypos = static_cast <float>(y - (glyph->size_y - glyph->bearing_y));
     
-    f32 w = (f32) glyph->size_x;
-    f32 h = (f32) glyph->size_y;
+    float w = static_cast <float>(glyph->size_x);
+    float h = static_cast <float>(glyph->size_y);
     
     Vector2 p0 = make_vector2(xpos+0, ypos+h);
     Vector2 p1 = make_vector2(xpos+0, ypos+0);
@@ -65,7 +65,7 @@ void draw_text(Font *font, char *text, int x, int y, Vector4 color) {
             }
 
             x += glyph->advance;
-
+            
             if (font->has_kerning) {
                 int next_codepoint_byte_count = 0;
                 int next_codepoint = get_codepoint(at + codepoint_byte_count, &next_codepoint_byte_count);

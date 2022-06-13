@@ -14,6 +14,8 @@
 #include <stdio.h>
 
 Globals globals = {};
+double global_time_rate = 1.0;
+static double last_time;
 
 Mesh *mesh;
 
@@ -21,12 +23,6 @@ static Entity_Manager *entity_manager = new Entity_Manager();
 
 Entity_Manager *get_entity_manager() {
     return entity_manager;
-}
-
-static void update_time() {
-    f64 now_time = os_get_time();
-    globals.time_info.current_dt = now_time - globals.time_info.last_time;    
-    globals.time_info.last_time = now_time;
 }
 
 static void game_init();
@@ -64,8 +60,8 @@ int main(int argc, char **argv) {
     mesh = load_obj("stall");
     mesh->map = find_or_create_texture("stall");
 
-    globals.time_info.last_time = os_get_time();
-    globals.time_info.current_dt = 0.0;
+    last_time = os_get_time();
+    globals.time_info.current_dt = 0.0f;
 
     game_init();
     main_loop();
@@ -150,7 +146,7 @@ static void main_loop() {
             
         swap_buffers();
         
-        update_time();
+        update_time(0.15f);
     }
 
     save_config();
@@ -167,4 +163,24 @@ static void game_init() {
 
 static void simulate_game() {
     simulate_guy(entity_manager->guy);
+}
+
+void update_time(float dt_max) {
+    double now = os_get_time();
+    double delta = now - last_time;
+    float dilated_dt = static_cast <float>(delta * global_time_rate);
+
+    float clamped_dilated_dt = dilated_dt;
+    if (clamped_dilated_dt > dt_max) clamped_dilated_dt = dt_max;
+
+    globals.time_info.current_dt = clamped_dilated_dt;
+    globals.time_info.current_time += clamped_dilated_dt;
+
+    globals.time_info.real_world_dt = dilated_dt;
+    globals.time_info.real_world_time += dilated_dt;
+    
+    globals.time_info.ui_dt = static_cast <float>(delta);
+    globals.time_info.ui_time += static_cast <float>(delta);
+
+    last_time = now;
 }

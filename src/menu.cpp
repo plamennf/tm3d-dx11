@@ -96,7 +96,7 @@ void draw_menu() {
     {
         int big_font_size = static_cast <int>(0.1f * render_target_height);
         Font *big_font = get_font_at_size("KarminaBoldItalic.otf", big_font_size);
-
+        
         char *text = "ThinMatrix's 3D OpenGL Series";
         int x = (render_target_width - get_string_width_in_pixels(big_font, text)) / 2;
         int y = static_cast <int>(0.85f * render_target_height);

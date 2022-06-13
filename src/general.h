@@ -362,9 +362,17 @@ inline char *mprintf(int size, char *fmt, ...) {
     return res;
 }
 
+extern double global_time_rate;
+
 struct Time_Info {
-    f64 last_time = 0.0;
-    f64 current_dt;
+    float current_time = 0.0f;
+    float current_dt = 0.0f;
+
+    float ui_time = 0.0f;
+    float ui_dt = 0.0f;
+
+    float real_world_time = 0.0f;
+    float real_world_dt = 0.0f;
 };
 
 enum Program_Mode {
@@ -380,6 +388,8 @@ struct Globals {
 };
 
 extern Globals globals;
+
+void update_time(float dt_max);
 
 void toggle_menu();
 

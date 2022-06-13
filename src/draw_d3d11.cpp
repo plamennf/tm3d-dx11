@@ -63,6 +63,7 @@ Matrix4 object_to_proj_matrix;
 bool draw_is_initted = false;
 
 static Shader *current_shader;
+static Texture_Map *white_texture;
 static Texture_Map *current_diffuse_map;
 static Texture_Map *current_render_target;
 static Texture_Map *current_depth_target;
@@ -448,6 +449,18 @@ void init_draw(bool vsync, bool multisample, int sample_count) {
     world_to_view_matrix = matrix4_identity();
     object_to_world_matrix = matrix4_identity();
     object_to_proj_matrix = matrix4_identity();
+
+    {
+        Bitmap bitmap = {};
+        bitmap.width = 1;
+        bitmap.height = 1;
+        bitmap.format = TEXTURE_FORMAT_RGBA8;
+
+        u8 data[4] = { 0xff, 0xff, 0xff, 0xff };
+        bitmap.data = data;
+
+        white_texture = create_texture(bitmap);
+    }
 }
 
 void resize_render_targets(int width, int height) {
@@ -756,8 +769,12 @@ void set_diffuse_texture(Texture_Map *map) {
     if (current_diffuse_map == map) return;
 
     immediate_flush();
-    
-    device_context->PSSetShaderResources(0, 1, (ID3D11ShaderResourceView **)&map->srv);
+
+    if (map) {
+        device_context->PSSetShaderResources(0, 1, (ID3D11ShaderResourceView **)&map->srv);
+    } else {
+        device_context->PSSetShaderResources(0, 1, (ID3D11ShaderResourceView **)&white_texture->srv);
+    }
     current_diffuse_map = map;
 }
 

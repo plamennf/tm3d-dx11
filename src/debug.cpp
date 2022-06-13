@@ -12,7 +12,7 @@ static f64 accumulated_dt;
 static f64 dt_for_draw;
 
 void draw_debug_info() {
-    f64 dt = globals.time_info.current_dt;
+    f64 dt = globals.time_info.real_world_dt;
     
     num_seconds_since_last_update += dt;
     num_frames_since_last_update++;
@@ -36,6 +36,7 @@ void draw_debug_info() {
     int offset = font->character_height / 20;
     
     {
+        if (!dt_for_draw) dt_for_draw = 1.0;
         char *text = mprintf("%.2lf fps", 1.0 / dt_for_draw);
         defer { delete [] text; };
         
@@ -63,6 +64,78 @@ void draw_debug_info() {
     
     {
         char *text = mprintf("Mouse pointer delta: (%d, %d)", get_mouse_pointer_delta_x(), get_mouse_pointer_delta_y());
+        defer { delete [] text; };
+
+        int x = render_target_width - get_string_width_in_pixels(font, text);
+        
+        draw_text(font, text, x + offset, y - offset, make_vector4(0, 0, 0, 1));
+        draw_text(font, text, x, y, make_vector4(1, 1, 1, 1));        
+    }
+
+    y -= font->character_height;
+    
+    {
+        char *text = mprintf("Current dt: %.2f", globals.time_info.current_dt);
+        defer { delete [] text; };
+
+        int x = render_target_width - get_string_width_in_pixels(font, text);
+        
+        draw_text(font, text, x + offset, y - offset, make_vector4(0, 0, 0, 1));
+        draw_text(font, text, x, y, make_vector4(1, 1, 1, 1));        
+    }
+
+    y -= font->character_height;
+    
+    {
+        char *text = mprintf("Current time: %.2f", globals.time_info.current_time);
+        defer { delete [] text; };
+        
+        int x = render_target_width - get_string_width_in_pixels(font, text);
+        
+        draw_text(font, text, x + offset, y - offset, make_vector4(0, 0, 0, 1));
+        draw_text(font, text, x, y, make_vector4(1, 1, 1, 1));        
+    }
+
+    y -= font->character_height;
+    
+    {
+        char *text = mprintf("Real world dt: %.2f", globals.time_info.real_world_dt);
+        defer { delete [] text; };
+
+        int x = render_target_width - get_string_width_in_pixels(font, text);
+        
+        draw_text(font, text, x + offset, y - offset, make_vector4(0, 0, 0, 1));
+        draw_text(font, text, x, y, make_vector4(1, 1, 1, 1));        
+    }
+
+    y -= font->character_height;
+    
+    {
+        char *text = mprintf("Real world time: %.2f", globals.time_info.real_world_time);
+        defer { delete [] text; };
+
+        int x = render_target_width - get_string_width_in_pixels(font, text);
+        
+        draw_text(font, text, x + offset, y - offset, make_vector4(0, 0, 0, 1));
+        draw_text(font, text, x, y, make_vector4(1, 1, 1, 1));        
+    }
+
+    y -= font->character_height;
+    
+    {
+        char *text = mprintf("Ui dt: %.2f", globals.time_info.ui_dt);
+        defer { delete [] text; };
+
+        int x = render_target_width - get_string_width_in_pixels(font, text);
+        
+        draw_text(font, text, x + offset, y - offset, make_vector4(0, 0, 0, 1));
+        draw_text(font, text, x, y, make_vector4(1, 1, 1, 1));        
+    }
+
+    y -= font->character_height;
+    
+    {
+        char *text = mprintf("Ui time: %.2f", globals.time_info.ui_time);
         defer { delete [] text; };
 
         int x = render_target_width - get_string_width_in_pixels(font, text);
