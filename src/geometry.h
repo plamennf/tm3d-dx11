@@ -161,7 +161,66 @@ inline Vector3 make_vector3(f32 x, f32 y, f32 z) {
 }
 
 inline Vector3 operator+(Vector3 left, Vector3 right) {
-    Vector3 result = make_vector3(left.x + right.x, left.y + right.y, left.z + right.z);
+    return make_vector3(left.x + right.x, left.y + right.y, left.z + right.z);
+}
+
+inline Vector3 operator-(Vector3 left, Vector3 right) {
+    return make_vector3(left.x - right.x, left.y - right.y, left.z - right.z);
+}
+
+inline Vector3 operator*(Vector3 left, float right) {
+    return make_vector3(left.x * right, left.y * right, left.z * right);
+}
+
+inline Vector3 &operator+=(Vector3 &left, Vector3 right) {
+    left.x += right.x;
+    left.y += right.y;
+    left.z += right.z;
+    return left;
+}
+
+inline Vector3 &operator-=(Vector3 &left, Vector3 right) {
+    left.x -= right.x;
+    left.y -= right.y;
+    left.z -= right.z;
+    return left;
+}
+
+inline float get_length_squared(Vector3 v) {
+    return v.x*v.x + v.y*v.y + v.z*v.z;
+}
+
+inline float get_length(Vector3 v) {
+    return sqrtf(get_length_squared(v));
+}
+    
+inline Vector3 normalize(Vector3 v) {
+    float multiplier = 1.0f / get_length(v);
+    v.x *= multiplier;
+    v.y *= multiplier;
+    v.z *= multiplier;
+    return v;
+}
+
+inline Vector3 normalize_or_zero(Vector3 v) {
+    Vector3 result = {};
+    
+    float length_squared = get_length_squared(v);
+    if (length_squared > 0.0001f * 0.0001f) {
+        float multiplier = 1.0f / sqrtf(length_squared);
+        result.x = v.x * multiplier;
+        result.y = v.y * multiplier;
+        result.z = v.z * multiplier;
+    }
+
+    return result;
+}
+
+inline Vector3 cross_product(Vector3 a, Vector3 b) {
+    Vector3 result;
+    result.x = a.y*b.z - a.z*b.y;
+    result.y = a.z*b.x - a.x*b.z;
+    result.z = a.x*b.y - a.y*b.x;
     return result;
 }
 
@@ -300,6 +359,30 @@ inline Matrix4 make_z_rotation(f32 t) {
     result._22 = ct;
     
     return result;
+}
+
+inline Matrix4 make_look_at_matrix(Vector3 position, Vector3 target, Vector3 world_up) {
+    Vector3 z_axis = normalize_or_zero(position - target);
+    Vector3 x_axis = normalize_or_zero(cross_product(normalize_or_zero(world_up), z_axis));
+    Vector3 y_axis = cross_product(z_axis, x_axis);
+
+    Matrix4 translation = matrix4_identity();
+    translation._14 = -position.x;
+    translation._24 = -position.y;
+    translation._34 = -position.z;
+
+    Matrix4 rotation = matrix4_identity();
+    rotation._11 = x_axis.x;
+    rotation._12 = x_axis.y;
+    rotation._13 = x_axis.z;
+    rotation._21 = y_axis.x;
+    rotation._22 = y_axis.y;
+    rotation._23 = y_axis.z;
+    rotation._31 = z_axis.x;
+    rotation._32 = z_axis.y;
+    rotation._33 = z_axis.z;
+
+    return rotation * translation;
 }
 
 struct Rectangle2i {

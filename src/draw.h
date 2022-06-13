@@ -3,6 +3,7 @@
 
 #include "geometry.h"
 #include "bitmap.h"
+#include "camera.h"
 
 struct Texture_Map {
     char *full_path;
@@ -47,6 +48,8 @@ extern Shader *shader_msaa_2x;
 extern Shader *shader_msaa_4x;
 extern Shader *shader_msaa_8x;
 extern Shader *shader_text;
+
+extern Camera camera;
 
 void init_draw(bool vsync, bool multisample, int sample_count);
 void swap_buffers();

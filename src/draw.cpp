@@ -18,6 +18,8 @@ Shader *shader_msaa_4x;
 Shader *shader_msaa_8x;
 Shader *shader_text;
 
+Camera camera;
+
 static void draw_game_3d();
 static void draw_game_2d();
 
@@ -89,6 +91,7 @@ void draw_game_view() {
 static void draw_game_3d() {
     f32 aspect_ratio = (f32)render_target_width / (f32)render_target_height;
     view_to_proj_matrix = make_perspective_projection(aspect_ratio, 70.0f * (PI / 180.0f), 0.1f, 1000.0f);
+    world_to_view_matrix = make_look_at_matrix(camera.position, camera.position + camera.target, camera.up);
     refresh_transform();
     
     set_shader(shader_basic_3d);
@@ -104,7 +107,6 @@ static void draw_game_3d() {
 }
 
 static void draw_game_2d() {
-#if 0
     //
     // Draw crosshair
     //
@@ -122,7 +124,6 @@ static void draw_game_2d() {
 
         draw_text(big_font, text, x, y, make_vector4(1, 1, 1, 1));
     }
-#endif
     
 #ifdef _DEBUG
     draw_debug_info();

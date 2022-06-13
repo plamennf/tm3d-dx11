@@ -159,10 +159,12 @@ static void game_init() {
     guy->mesh = load_obj("dragon");
     guy->mesh->map = find_or_create_texture("white");
     guy->position = make_vector3(0, 0, -50);
+
+    camera = make_camera(make_vector3(0, 0, 0), 0, 0, 0);
 }
 
 static void simulate_game() {
-    simulate_guy(entity_manager->guy);
+    update_camera(&camera);
 }
 
 void update_time(float dt_max) {

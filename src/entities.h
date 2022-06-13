@@ -36,8 +36,6 @@ struct Guy : public Entity {
     bool is_in_air = false;
 };
 
-void simulate_guy(Guy *guy);
-
 struct Entity_Manager {
     Array <Light *> lights;
 

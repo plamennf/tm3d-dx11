@@ -1,36 +1,63 @@
+#include "general.h"
 #include "camera.h"
+#include "input.h"
 
-#if 0
-static void calculate_zoom(Camera *camera) {
-    f32 zoom_level = get_scroll_offset();
-    camera->distance_from_player -= zoom_level;
-}
-
-static void calculate_pitch(Camera *camera) {
-    if (is_key_down(MOUSE_BUTTON_RIGHT)) {
-        float pitch_change = get_mouse_y_offset();
-        camera->pitch -= pitch_change;
-    }
-}
-
-static void calculate_angle_around_player(Camera *camera) {
-    if (is_key_down(MOUSE_BUTTON_LEFT)) {
-        float angle_change = get_mouse_x_offset();
-        camera->angle_around_player -= angle_change;
-    }
-}
-
-Camera make_camera(Guy *guy) {
+Camera make_camera(Vector3 position, float pitch, float yaw, float roll) {
     Camera result = {};
-
-    result.guy = guy;
-    
+    result.position = position;
+    result.target = position - make_vector3(0, 0, 1);
+    result.up = make_vector3(0, 1, 0);
+    result.pitch = pitch;
+    result.yaw = yaw;
+    result.roll = roll;
     return result;
 }
 
 void update_camera(Camera *camera) {
-    calculate_zoom(camera);
-    calculate_pitch(camera);
-    calculate_angle_around_player(camera);
+    float dt = globals.time_info.current_dt;
+
+    float sensitivity = 0.1f;
+    camera->yaw += get_mouse_pointer_delta_x() * sensitivity;
+    camera->pitch += get_mouse_pointer_delta_y() * sensitivity;
+
+    Clamp(&camera->pitch, -89.0f, 89.0f);
+
+    float old_y = camera->position.y;
+    float movement_speed = 12.5f;
+
+    Vector3 world_up = make_vector3(0, 1, 0);
+    Vector3 right = normalize_or_zero(cross_product(camera->target, world_up));
+    Vector3 up = normalize_or_zero(cross_product(right, camera->target));
+
+    camera->target = make_vector3(0, 0, 0);
+    camera->target.x = cosf(camera->yaw * (PI / 180.0f)) * cosf(camera->pitch * (PI / 180.0f));
+    camera->target.z = sinf(camera->yaw * (PI / 180.0f)) * cosf(camera->pitch * (PI / 180.0f));
+    Vector3 camera_target = normalize_or_zero(camera->target);
+
+    if (is_key_down(KEY_W)) camera->position += camera_target * movement_speed * dt;
+    else if (is_key_down(KEY_S)) camera->position -= camera_target * movement_speed * dt;
+
+    if (is_key_down(KEY_A)) camera->position -= right * movement_speed * dt;
+    else if (is_key_down(KEY_D)) camera->position += right * movement_speed * dt;
+
+    camera->position.y = old_y;
+
+    camera->target.y = sinf(camera->pitch * (PI / 180.0f));
+    camera->target = normalize_or_zero(camera->target);
+
+    if (is_key_down(KEY_SPACE)) {
+        if (camera->is_on_ground) {
+            camera->jump_velocity = 15.0f * dt;
+            camera->is_on_ground = false;
+        }
+    }
+
+    camera->jump_velocity -= 1.0f * dt;
+
+    camera->position.y += camera->jump_velocity;
+
+    if (camera->position.y < 3.0f) {
+        camera->position.y = 3.0f;
+        camera->is_on_ground = true;
+    }
 }
-#endif
