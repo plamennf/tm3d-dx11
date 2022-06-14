@@ -1,6 +1,7 @@
 #include "general.h"
 #include "camera.h"
 #include "input.h"
+#include "terrain.h"
 
 Camera make_camera(Vector3 position, float pitch, float yaw, float roll) {
     Camera result = {};
@@ -47,17 +48,26 @@ void update_camera(Camera *camera) {
 
     if (is_key_down(KEY_SPACE)) {
         if (camera->is_on_ground) {
-            camera->jump_velocity = 15.0f * dt;
+            camera->jump_velocity = 50.0f * dt;
             camera->is_on_ground = false;
         }
     }
-
+    
     camera->jump_velocity -= 1.0f * dt;
 
     camera->position.y += camera->jump_velocity;
 
+#if 1
+    Terrain *terrain = get_terrain_at(camera->position);
+    float terrain_height = get_terrain_height_at(terrain, -camera->position.x, -camera->position.z);
+    if (camera->position.y < terrain_height + 3.0f) {
+        camera->position.y = terrain_height + 3.0f;
+        camera->is_on_ground = true;
+    }
+#else
     if (camera->position.y < 3.0f) {
         camera->position.y = 3.0f;
         camera->is_on_ground = true;
     }
+#endif
 }

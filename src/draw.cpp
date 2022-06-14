@@ -17,6 +17,7 @@ Shader *shader_msaa_2x;
 Shader *shader_msaa_4x;
 Shader *shader_msaa_8x;
 Shader *shader_text;
+Shader *shader_terrain;
 
 Camera camera;
 
@@ -93,6 +94,8 @@ static void draw_game_3d() {
     view_to_proj_matrix = make_perspective_projection(aspect_ratio, 70.0f * (PI / 180.0f), 0.1f, 1000.0f);
     world_to_view_matrix = make_look_at_matrix(camera.position, camera.position + camera.target, camera.up);
     refresh_transform();
+
+    draw_terrains();
     
     set_shader(shader_basic_3d);
 

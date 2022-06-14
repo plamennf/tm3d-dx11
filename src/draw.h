@@ -4,6 +4,7 @@
 #include "geometry.h"
 #include "bitmap.h"
 #include "camera.h"
+#include "terrain.h"
 
 struct Texture_Map {
     char *full_path;
@@ -48,6 +49,7 @@ extern Shader *shader_msaa_2x;
 extern Shader *shader_msaa_4x;
 extern Shader *shader_msaa_8x;
 extern Shader *shader_text;
+extern Shader *shader_terrain;
 
 extern Camera camera;
 
@@ -80,6 +82,7 @@ void set_depth_target(Texture_Map *map);
 
 void set_shader(Shader *shader);
 void set_diffuse_texture(Texture_Map *map);
+void set_terrain_textures(Terrain_Texture_Pack pack);
 
 void refresh_transform();
 void rendering_2d_right_handed();

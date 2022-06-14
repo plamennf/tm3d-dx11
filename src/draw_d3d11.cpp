@@ -24,6 +24,8 @@
 #include "compiled/msaa_8x_ps.h"
 #include "compiled/text_vs.h"
 #include "compiled/text_ps.h"
+#include "compiled/terrain_vs.h"
+#include "compiled/terrain_ps.h"
 
 #define SafeRelease(ptr) do { if (ptr) { ptr->Release(); ptr = nullptr; } } while (false)
 
@@ -776,6 +778,15 @@ void set_diffuse_texture(Texture_Map *map) {
         device_context->PSSetShaderResources(0, 1, (ID3D11ShaderResourceView **)&white_texture->srv);
     }
     current_diffuse_map = map;
+}
+
+void set_terrain_textures(Terrain_Texture_Pack pack) {
+    current_diffuse_map = nullptr;
+    
+    device_context->PSSetShaderResources(0, 1, (ID3D11ShaderResourceView **)&pack.background_texture->srv);
+    device_context->PSSetShaderResources(1, 1, (ID3D11ShaderResourceView **)&pack.r_texture->srv);
+    device_context->PSSetShaderResources(2, 1, (ID3D11ShaderResourceView **)&pack.g_texture->srv);
+    device_context->PSSetShaderResources(3, 1, (ID3D11ShaderResourceView **)&pack.b_texture->srv);
 }
 
 Texture_Map *create_texture(Bitmap bitmap) {

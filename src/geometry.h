@@ -404,4 +404,12 @@ inline Vector2 get_vec2(float theta) {
     return make_vector2(ct, st);
 }
 
+inline float get_barycentric(Vector3 p0, Vector3 p1, Vector3 p2, Vector2 pos) {
+    float det = (p1.z - p2.z) * (p0.x - p2.x) + (p2.x - p1.x) * (p0.z - p2.z);
+    float l0 = ((p1.z - p2.z) * (pos.x - p2.x) + (p2.x - p1.x) * (pos.y - p2.z)) / det;
+    float l1 = ((p2.z - p0.z) * (pos.x - p2.x) + (p0.x - p2.x) * (pos.y - p2.z)) / det;
+    float l2 = 1.0f - l0 - l1;
+    return l0*p0.y + l1*p1.y + l2*p2.y;
+}
+
 #endif

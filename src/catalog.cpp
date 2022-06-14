@@ -16,7 +16,7 @@ Texture_Map *find_or_create_texture(char *short_name) {
             return map;
         }
     }
-
+    
     char *extensions[] = {
         "png",
         "jpg",

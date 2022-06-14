@@ -6,6 +6,7 @@
 
 struct Mesh;
 struct Entity_Manager;
+struct Terrain;
 
 struct Entity {
     Entity_Manager *manager = nullptr;
@@ -38,7 +39,7 @@ struct Guy : public Entity {
 
 struct Entity_Manager {
     Array <Light *> lights;
-
+    
     Guy *guy;
 
     inline Guy *add_guy() {

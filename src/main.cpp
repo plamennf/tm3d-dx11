@@ -161,6 +161,24 @@ static void game_init() {
     guy->position = make_vector3(0, 0, -50);
 
     camera = make_camera(make_vector3(0, 0, 0), 0, 0, 0);
+
+    //
+    // Init terrains
+    //
+    {   
+        Terrain_Texture_Pack texture_pack;
+        texture_pack.background_texture = find_or_create_texture("grass");
+        texture_pack.r_texture = find_or_create_texture("dirt");
+        texture_pack.g_texture = find_or_create_texture("pinkFlowers");
+        texture_pack.b_texture = find_or_create_texture("path");
+        
+        Texture_Map *blend_map = find_or_create_texture("blendMap");
+        
+        make_terrain(0, 0, texture_pack, blend_map, "heightmap");
+        make_terrain(1, 0, texture_pack, blend_map, "heightmap");
+        make_terrain(1, 1, texture_pack, blend_map, "heightmap");
+        make_terrain(0, 1, texture_pack, blend_map, "heightmap");
+    }
 }
 
 static void simulate_game() {

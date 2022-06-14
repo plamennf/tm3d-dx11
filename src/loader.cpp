@@ -38,7 +38,7 @@ Mesh *make_mesh(u32 num_vertices, Vector3 *positions, Vector2 *uvs, Vector3 *nor
 }
 
 Mesh *load_obj(char *filename) {
-    char *full_path = mprintf("data/models/%s.obj", filename);
+    char *full_path = mprintf("data/meshes/%s.obj", filename);
     defer { delete [] full_path; };
 
     char *data = os_read_entire_file(full_path);

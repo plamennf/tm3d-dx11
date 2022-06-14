@@ -49,6 +49,7 @@ headers {
     src\hash_table.h
     src\config.h
     src\text_file_handler.h
+    src\terrain.h
 }
 
 files {
@@ -67,6 +68,8 @@ files {
     src\menu.cpp
     src\config.cpp
     src\text_file_handler.cpp
+    src\terrain.cpp
+    src\bitmap.cpp
 }
 
 prebuildcmd: compile_shaders.bat
