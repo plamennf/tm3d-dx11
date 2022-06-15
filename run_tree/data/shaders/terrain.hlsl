@@ -50,8 +50,18 @@ PSOutput pixel_main(VSOutput input) {
     float4 b_texture_color = r_texture.Sample(texture_sampler, tiled_uv) * blend_map_color.b;
 
     float4 total_color = background_texture_color + r_texture_color + g_texture_color + b_texture_color;
-
-    output.color = total_color;
+    
+    float3 light_pos = float3(0.0, 50.0, 5000.0);
+    
+    float3 light_dir = normalize(light_pos - input.world_position.xyz);
+    float3 normal = normalize(input.world_normal);
+    float dot_result = dot(normal, light_dir);
+    float brightness = max(0.0, dot_result);
+    float3 diffuse = brightness;
+    
+    diffuse = max(diffuse, 0.1);
+    
+    output.color = total_color * float4(diffuse, 1.0);
     
     return output;
 }

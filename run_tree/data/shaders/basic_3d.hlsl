@@ -37,9 +37,9 @@ PSOutput pixel_main(VSOutput input) {
     PSOutput output;
 
     float3 light_pos = float3(0.0, 0.0, 0.0);
-
+    
     float3 light_dir = normalize(light_pos - input.world_position.xyz);
-    float dot_result = dot(input.world_normal, light_dir);
+    float dot_result = dot(normalize(input.world_normal), light_dir);
     float brightness = max(0.0, dot_result);
     float3 diffuse = brightness;
     

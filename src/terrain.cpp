@@ -28,7 +28,7 @@ inline Vector3 calculate_normal(int x, int z, Bitmap bitmap) {
     float height_u = 0.0f;
 
     if (x == 0) {
-        height_l = get_terrain_height(x-1 + bitmap.height - 1, z, bitmap);
+        height_l = get_terrain_height(x-1 + bitmap.height, z, bitmap);
         height_r = get_terrain_height(x+1, z, bitmap);
     } else if (x == 1) {
         height_l = get_terrain_height(x-1 + bitmap.height - 1, z, bitmap);
@@ -37,7 +37,7 @@ inline Vector3 calculate_normal(int x, int z, Bitmap bitmap) {
         height_r = get_terrain_height(x+1 - bitmap.height, z, bitmap);
         height_l = get_terrain_height(x-1, z, bitmap);
     } else if (x == bitmap.height - 1) {
-        height_r = get_terrain_height(x-1 - bitmap.height + 1, z, bitmap);
+        height_r = get_terrain_height(x+1 - bitmap.height + 1, z, bitmap);
         height_l = get_terrain_height(x-1, z, bitmap);
     } else {
         height_l = get_terrain_height(x-1, z, bitmap);
@@ -60,7 +60,7 @@ inline Vector3 calculate_normal(int x, int z, Bitmap bitmap) {
         height_d = get_terrain_height(x, z-1, bitmap);
         height_u = get_terrain_height(x, z+1, bitmap);
     }
-
+    
     return normalize_or_zero(make_vector3(height_l-height_r, 2.0f, height_d-height_u));
 }
 
@@ -154,15 +154,9 @@ float get_terrain_height_at(Terrain *terrain, float world_x, float world_z) {
 
     float result;
     if (x_coord <= 1.0f-z_coord) {
-        result = get_barycentric(make_vector3(0, terrain->heights[grid_z * num_heights + grid_x], 0),
-                                 make_vector3(1, terrain->heights[grid_z * num_heights + grid_x + 1], 0),
-                                 make_vector3(0, terrain->heights[(grid_z + 1) * num_heights + grid_x], 1),
-                                 make_vector2(x_coord, z_coord));
+        result = get_barycentric(make_vector3(0, terrain->heights[grid_z * num_heights + grid_x], 0), make_vector3(1, terrain->heights[grid_z * num_heights + grid_x + 1], 0), make_vector3(0, terrain->heights[(grid_z + 1) * num_heights + grid_x], 1), make_vector2(x_coord, z_coord));
     } else {
-        result = get_barycentric(make_vector3(1, terrain->heights[grid_z * num_heights + grid_x + 1], 0),
-                                 make_vector3(1, terrain->heights[(grid_z + 1) * num_heights + grid_x + 1], 1),
-                                 make_vector3(0, terrain->heights[(grid_z + 1) * num_heights + grid_x], 1),
-                                 make_vector2(x_coord, z_coord));
+        result = get_barycentric(make_vector3(1, terrain->heights[grid_z * num_heights + grid_x + 1], 0), make_vector3(1, terrain->heights[(grid_z + 1) * num_heights + grid_x + 1], 1), make_vector3(0, terrain->heights[(grid_z + 1) * num_heights + grid_x], 1), make_vector2(x_coord, z_coord));
     }
     return result;
 }

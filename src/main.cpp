@@ -17,8 +17,6 @@ Globals globals = {};
 double global_time_rate = 1.0;
 static double last_time;
 
-Mesh *mesh;
-
 static Entity_Manager *entity_manager = new Entity_Manager();
 
 Entity_Manager *get_entity_manager() {
@@ -57,9 +55,6 @@ int main(int argc, char **argv) {
         resize_offscreen_buffer(width, height);
     }
     
-    mesh = load_obj("stall");
-    mesh->map = find_or_create_texture("stall");
-
     last_time = os_get_time();
     globals.time_info.current_dt = 0.0f;
 
@@ -91,7 +86,7 @@ static void main_loop() {
                 simulate_game();
             }
         }
-
+        
         if (the_offscreen_buffer && the_offscreen_depth_buffer) {
             set_render_target(the_offscreen_buffer);
             set_depth_target(the_offscreen_depth_buffer);
